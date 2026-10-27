@@ -1,8 +1,33 @@
 <header class="header">
-  <a class="brand" routerLink="/">BookHub</a>
-  <nav aria-label="Navigation principale">
-    <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }"
-      >Accueil</a
+  <div class="header-inner">
+    <a class="brand" routerLink="/books" (click)="closeMenu()">Book<span>Hub</span></a>
+
+    <button
+      type="button"
+      class="menu-button"
+      aria-controls="main-nav"
+      [attr.aria-expanded]="menuOpen()"
+      (click)="toggleMenu()"
     >
-  </nav>
+      ≡ Menu
+    </button>
+
+    <nav id="main-nav" aria-label="Navigation principale" [class.open]="menuOpen()">
+      <a
+        routerLink="/books"
+        routerLinkActive="active"
+        [routerLinkActiveOptions]="{ exact: true }"
+        (click)="closeMenu()"
+        >Catalogue</a
+      >
+      <a routerLink="/books/search" routerLinkActive="active" (click)="closeMenu()">Recherche</a>
+      <a routerLink="/login" routerLinkActive="active" (click)="closeMenu()">Connexion</a>
+    </nav>
+
+    <div class="account" [class.open]="menuOpen()">
+      <span class="visitor">Visiteur</span>
+      <a class="btn btn-light" routerLink="/login" (click)="closeMenu()">Connexion</a>
+      <a class="btn btn-accent" routerLink="/register" (click)="closeMenu()">Inscription</a>
+    </div>
+  </div>
 </header>

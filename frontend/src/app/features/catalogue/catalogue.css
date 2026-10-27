@@ -1,0 +1,41 @@
+.intro {
+  margin-bottom: 2rem;
+}
+
+.search {
+  display: flex;
+  gap: 0.75rem;
+  max-width: 600px;
+}
+
+.search input {
+  flex: 1;
+  min-width: 0;
+}
+
+.empty {
+  padding: 3rem 1rem;
+  text-align: center;
+  color: var(--color-muted);
+}
+
+.empty-icon {
+  width: 48px;
+  height: 48px;
+  fill: none;
+  stroke: var(--color-primary);
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.empty-title {
+  margin-bottom: 0.25rem;
+  font-family: var(--font-title);
+  font-size: 1.1rem;
+  color: var(--color-primary-dark);
+}
+
+.empty p {
+  margin-top: 0;
+}

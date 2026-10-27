@@ -4,7 +4,6 @@ spring:
   profiles:
     default: dev
 
-  # Base Neon (PostgreSQL) - schéma créé par docs/BookHub – Script SQL Neon (PostgreSQL).sql
   datasource:
     url: ${DB_URL}
     username: ${DB_USERNAME}
@@ -12,8 +11,11 @@ spring:
     hikari:
       maximum-pool-size: 5
 
+  flyway:
+    locations: classpath:db/migration
+
   jpa:
-    # Le schéma est géré par le script SQL : Hibernate le vérifie sans le modifier
+    # Le schéma est géré par Flyway : Hibernate le vérifie sans le modifier
     hibernate:
       ddl-auto: validate
     open-in-view: false

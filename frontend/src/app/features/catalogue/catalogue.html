@@ -1,0 +1,22 @@
+<section class="intro">
+  <h1>Catalogue des ouvrages</h1>
+  <p class="subtitle">Parcourez les livres de la bibliothèque, sans avoir besoin de compte.</p>
+
+  <form class="search" role="search" [formGroup]="searchForm" (ngSubmit)="onSearch()">
+    <input
+      type="search"
+      aria-label="Rechercher un livre"
+      placeholder="Rechercher un titre, un auteur, un ISBN…"
+      formControlName="query"
+    />
+    <button type="submit" class="btn btn-primary">Rechercher</button>
+  </form>
+</section>
+
+<div class="card empty">
+  <svg class="empty-icon" viewBox="0 0 24 24" aria-hidden="true">
+    <path d="M4 4.5A2.5 2.5 0 0 1 6.5 2H20v16H6.5a2.5 2.5 0 0 0 0 5H20v-2M6.5 18H20M8 6h8M8 10h6" />
+  </svg>
+  <p class="empty-title">Aucun livre à afficher pour le moment.</p>
+  <p>Le catalogue sera bientôt disponible.</p>
+</div>

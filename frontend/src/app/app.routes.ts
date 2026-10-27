@@ -2,16 +2,16 @@ import { Routes } from '@angular/router';
 
 import { Layout } from './core/layout/layout';
 
-/** Les pages des features sont chargées à la demande (loadComponent). */
 export const routes: Routes = [
   {
     path: '',
     component: Layout,
     children: [
+      { path: '', redirectTo: 'books', pathMatch: 'full' },
       {
-        path: '',
-        title: 'BookHub',
-        loadComponent: () => import('./features/home/home').then((m) => m.Home),
+        path: 'books',
+        title: 'Catalogue · BookHub',
+        loadComponent: () => import('./features/catalogue/catalogue').then((m) => m.Catalogue),
       },
       {
         path: '**',

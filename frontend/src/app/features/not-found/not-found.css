@@ -1,0 +1,13 @@
+.not-found {
+  max-width: 480px;
+  margin: 2rem auto;
+  text-align: center;
+}
+
+.code {
+  margin: 0;
+  font-family: var(--font-title);
+  font-size: 3rem;
+  font-weight: 900;
+  color: var(--color-accent);
+}

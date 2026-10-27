@@ -21,17 +21,11 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
-/**
- * Traduit les exceptions en réponses RFC 9457 (application/problem+json).
- * Les erreurs du framework (JSON illisible, méthode non supportée, 404 de route...)
- * sont gérées par {@link ResponseEntityExceptionHandler}.
- */
 @RestControllerAdvice
 public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 
   private static final Logger log = LoggerFactory.getLogger(ApiExceptionHandler.class);
 
-  /** 400 - Corps de requête invalide (@Valid) : détail des erreurs par champ. */
   @Override
   protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex,
       HttpHeaders headers, HttpStatusCode status, WebRequest request) {
@@ -48,7 +42,6 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
     return handleExceptionInternal(ex, problem, headers, status, request);
   }
 
-  /** 400 - Paramètre de chemin ou de requête invalide (@Validated sur un service ou contrôleur). */
   @ExceptionHandler(ConstraintViolationException.class)
   public ProblemDetail handleConstraintViolation(ConstraintViolationException ex) {
     Map<String, String> errors = new LinkedHashMap<>();
@@ -60,32 +53,27 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
     return problem;
   }
 
-  /** 401 - Authentification absente ou invalide levée dans un contrôleur ou un service. */
   @ExceptionHandler(AuthenticationException.class)
   public ProblemDetail handleAuthentication(AuthenticationException ex) {
     return problem(HttpStatus.UNAUTHORIZED, "Non authentifié", "Authentification requise.");
   }
 
-  /** 403 - Rôle insuffisant (@PreAuthorize) : sans ce handler, elle finirait en 500. */
   @ExceptionHandler(AccessDeniedException.class)
   public ProblemDetail handleAccessDenied(AccessDeniedException ex) {
     return problem(HttpStatus.FORBIDDEN, "Accès refusé",
         "Vous n'avez pas les droits nécessaires pour cette action.");
   }
 
-  /** 404 - Ressource métier introuvable. */
   @ExceptionHandler(ResourceNotFoundException.class)
   public ProblemDetail handleNotFound(ResourceNotFoundException ex) {
     return problem(HttpStatus.NOT_FOUND, "Ressource introuvable", ex.getMessage());
   }
 
-  /** 409 - Règle de gestion non respectée. */
   @ExceptionHandler(BusinessRuleException.class)
   public ProblemDetail handleBusinessRule(BusinessRuleException ex) {
     return problem(HttpStatus.CONFLICT, "Règle de gestion non respectée", ex.getMessage());
   }
 
-  /** 409 - Contrainte de la base violée (ISBN ou e-mail déjà utilisé, stock épuisé...). */
   @ExceptionHandler(DataIntegrityViolationException.class)
   public ProblemDetail handleDataIntegrity(DataIntegrityViolationException ex) {
     log.warn("Contrainte d'intégrité violée : {}", ex.getMostSpecificCause().getMessage());
@@ -93,7 +81,6 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
         "L'opération est incompatible avec les données existantes.");
   }
 
-  /** 500 - Erreur inattendue : journalisée, sans détail technique dans la réponse. */
   @ExceptionHandler(Exception.class)
   public ProblemDetail handleUnexpected(Exception ex) {
     log.error("Erreur inattendue", ex);

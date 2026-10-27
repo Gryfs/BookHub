@@ -1,0 +1,23 @@
+spring:
+  application:
+    name: bookhub
+  profiles:
+    default: dev
+
+  # Base Neon (PostgreSQL) - schéma créé par docs/BookHub – Script SQL Neon (PostgreSQL).sql
+  datasource:
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    hikari:
+      maximum-pool-size: 5
+
+  jpa:
+    # Le schéma est géré par le script SQL : Hibernate le vérifie sans le modifier
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+    properties:
+      hibernate:
+        jdbc:
+          time_zone: Europe/Paris

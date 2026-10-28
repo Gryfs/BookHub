@@ -139,3 +139,28 @@ textarea:focus {
   background: var(--color-danger-light);
   color: var(--color-danger);
 }
+
+.alert {
+  padding: 0.85rem 1rem;
+  border-left: 4px solid;
+  border-radius: var(--radius);
+  font-weight: 600;
+}
+
+.alert-error {
+  border-color: var(--color-danger);
+  background: var(--color-danger-light);
+  color: var(--color-danger);
+}
+
+.alert-success {
+  border-color: var(--color-success);
+  background: var(--color-success-light);
+  color: var(--color-success);
+}
+
+.alert-warning {
+  border-color: var(--color-accent);
+  background: #fdeee6;
+  color: var(--color-accent-dark);
+}

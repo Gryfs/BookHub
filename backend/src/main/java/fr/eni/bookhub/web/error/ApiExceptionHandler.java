@@ -14,6 +14,7 @@ import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -51,6 +52,11 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
         "Un ou plusieurs paramètres sont invalides.");
     problem.setProperty("errors", errors);
     return problem;
+  }
+
+  @ExceptionHandler(BadCredentialsException.class)
+  public ProblemDetail handleBadCredentials(BadCredentialsException ex) {
+    return problem(HttpStatus.UNAUTHORIZED, "Connexion refusée", "Email ou mot de passe incorrect.");
   }
 
   @ExceptionHandler(AuthenticationException.class)

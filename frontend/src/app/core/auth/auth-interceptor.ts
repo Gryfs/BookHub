@@ -1,17 +1,29 @@
-import { HttpInterceptorFn } from '@angular/common/http';
+import { HttpErrorResponse, HttpInterceptorFn } from '@angular/common/http';
 import { inject } from '@angular/core';
+import { Router } from '@angular/router';
+import { catchError, throwError } from 'rxjs';
 
 import { environment } from '../../../environments/environment';
-import { TokenStorage } from './token-storage';
+import { Session } from './session';
 
-/**
- * Ajoute le JWT (Authorization: Bearer) aux appels vers l'API BookHub.
- * Les requêtes vers d'autres domaines ne reçoivent jamais le jeton.
- */
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
-  const token = inject(TokenStorage).getToken();
+  const session = inject(Session);
+  const router = inject(Router);
+  const token = session.getToken();
+
   if (!token || !req.url.startsWith(environment.apiUrl)) {
     return next(req);
   }
-  return next(req.clone({ setHeaders: { Authorization: `Bearer ${token}` } }));
+
+  const authReq = req.clone({ setHeaders: { Authorization: `Bearer ${token}` } });
+
+  return next(authReq).pipe(
+    catchError((error: HttpErrorResponse) => {
+      if (error.status === 401) {
+        session.clear();
+        router.navigate(['/login'], { queryParams: { expired: 1 } });
+      }
+      return throwError(() => error);
+    }),
+  );
 };

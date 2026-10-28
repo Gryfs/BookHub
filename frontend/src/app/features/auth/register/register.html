@@ -1,0 +1,75 @@
+<div class="card auth-card">
+  <h1>Créer un compte</h1>
+  <p class="subtitle">Inscrivez-vous pour emprunter et réserver des livres.</p>
+
+  @if (errorMessage()) {
+    <div class="alert alert-error">{{ errorMessage() }}</div>
+  }
+
+  <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" novalidate>
+    <div class="field">
+      <label for="firstName">Prénom</label>
+      <input id="firstName" type="text" formControlName="firstName" autocomplete="given-name" />
+      @if (isInvalid('firstName')) {
+        <p class="field-error">Le prénom est obligatoire.</p>
+      }
+    </div>
+
+    <div class="field">
+      <label for="lastName">Nom</label>
+      <input id="lastName" type="text" formControlName="lastName" autocomplete="family-name" />
+      @if (isInvalid('lastName')) {
+        <p class="field-error">Le nom est obligatoire.</p>
+      }
+    </div>
+
+    <div class="field">
+      <label for="email">Email</label>
+      <input id="email" type="email" formControlName="email" autocomplete="email" />
+      @if (registerForm.controls.email.hasError('alreadyUsed')) {
+        <p class="field-error">Cette adresse email est déjà utilisée.</p>
+      } @else if (isInvalid('email')) {
+        <p class="field-error">Veuillez saisir un email valide.</p>
+      }
+    </div>
+
+    <div class="field">
+      <label for="password">Mot de passe</label>
+      <input id="password" type="password" formControlName="password" autocomplete="new-password" />
+      <p class="hint">
+        Au moins 12 caractères, avec une majuscule, une minuscule, un chiffre et un caractère
+        spécial.
+      </p>
+      @if (isInvalid('password')) {
+        <p class="field-error">Mot de passe trop faible (règles non respectées).</p>
+      }
+    </div>
+
+    <div class="field">
+      <label for="confirmPassword">Confirmer le mot de passe</label>
+      <input
+        id="confirmPassword"
+        type="password"
+        formControlName="confirmPassword"
+        autocomplete="new-password"
+      />
+      @if (
+        registerForm.controls.confirmPassword.touched && registerForm.hasError('passwordsMismatch')
+      ) {
+        <p class="field-error">Les mots de passe ne correspondent pas.</p>
+      }
+    </div>
+
+    <div class="field checkbox">
+      <input id="consent" type="checkbox" formControlName="consent" />
+      <label for="consent">J'accepte le traitement de mes données personnelles (RGPD).</label>
+    </div>
+    @if (isInvalid('consent')) {
+      <p class="field-error">Vous devez accepter le traitement de vos données.</p>
+    }
+
+    <button type="submit" class="btn btn-primary" [disabled]="loading()">Créer mon compte</button>
+  </form>
+
+  <p class="switch">Déjà inscrit ? <a routerLink="/login">Se connecter</a></p>
+</div>

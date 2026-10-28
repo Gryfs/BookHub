@@ -13,6 +13,11 @@
     </button>
 
     <nav id="main-nav" aria-label="Navigation principale" [class.open]="menuOpen()">
+      @if (session.isLoggedIn()) {
+        <a [routerLink]="session.homeUrl()" routerLinkActive="active" (click)="closeMenu()">{{
+          homeLabel()
+        }}</a>
+      }
       <a
         routerLink="/books"
         routerLinkActive="active"
@@ -21,13 +26,20 @@
         >Catalogue</a
       >
       <a routerLink="/books/search" routerLinkActive="active" (click)="closeMenu()">Recherche</a>
-      <a routerLink="/login" routerLinkActive="active" (click)="closeMenu()">Connexion</a>
+      @if (!session.isLoggedIn()) {
+        <a routerLink="/login" routerLinkActive="active" (click)="closeMenu()">Connexion</a>
+      }
     </nav>
 
     <div class="account" [class.open]="menuOpen()">
-      <span class="visitor">Visiteur</span>
-      <a class="btn btn-light" routerLink="/login" (click)="closeMenu()">Connexion</a>
-      <a class="btn btn-accent" routerLink="/register" (click)="closeMenu()">Inscription</a>
+      @if (session.user(); as user) {
+        <span class="user-name">{{ displayName() }} · {{ user.role }}</span>
+        <button type="button" class="btn btn-light" (click)="logout()">Déconnexion</button>
+      } @else {
+        <span class="visitor">Visiteur</span>
+        <a class="btn btn-light" routerLink="/login" (click)="closeMenu()">Connexion</a>
+        <a class="btn btn-accent" routerLink="/register" (click)="closeMenu()">Inscription</a>
+      }
     </div>
   </div>
 </header>

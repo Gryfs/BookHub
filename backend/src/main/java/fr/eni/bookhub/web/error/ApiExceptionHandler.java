@@ -1,6 +1,7 @@
 package fr.eni.bookhub.web.error;
 
 import fr.eni.bookhub.service.exception.BusinessRuleException;
+import fr.eni.bookhub.service.exception.InvalidFieldException;
 import fr.eni.bookhub.service.exception.ResourceNotFoundException;
 import jakarta.validation.ConstraintViolationException;
 import java.util.LinkedHashMap;
@@ -51,6 +52,14 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
     ProblemDetail problem = problem(HttpStatus.BAD_REQUEST, "Données invalides",
         "Un ou plusieurs paramètres sont invalides.");
     problem.setProperty("errors", errors);
+    return problem;
+  }
+
+  @ExceptionHandler(InvalidFieldException.class)
+  public ProblemDetail handleInvalidField(InvalidFieldException ex) {
+    ProblemDetail problem = problem(HttpStatus.BAD_REQUEST, "Données invalides",
+        "Un ou plusieurs champs sont invalides.");
+    problem.setProperty("errors", Map.of(ex.getField(), ex.getMessage()));
     return problem;
   }
 

@@ -1,25 +1,11 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component, inject, signal } from '@angular/core';
-import {
-  AbstractControl,
-  FormControl,
-  FormGroup,
-  ReactiveFormsModule,
-  ValidationErrors,
-  Validators,
-} from '@angular/forms';
+import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 
 import { Auth } from '../../../core/auth/auth';
 import { ProblemDetail } from '../../../shared/models/problem-detail';
-
-const PASSWORD_PATTERN = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^a-zA-Z\d]).{12,}$/;
-
-function passwordsMatch(group: AbstractControl): ValidationErrors | null {
-  const password = group.get('password')?.value;
-  const confirmPassword = group.get('confirmPassword')?.value;
-  return password === confirmPassword ? null : { passwordsMismatch: true };
-}
+import { fieldsMatch, PASSWORD_HINT, PASSWORD_PATTERN } from '../../../shared/validators/password';
 
 @Component({
   selector: 'app-register',
@@ -62,8 +48,10 @@ export class Register {
       }),
       consent: new FormControl(false, { nonNullable: true, validators: [Validators.requiredTrue] }),
     },
-    { validators: passwordsMatch },
+    { validators: fieldsMatch('password', 'confirmPassword') },
   );
+
+  protected readonly passwordHint = PASSWORD_HINT;
 
   isInvalid(name: string): boolean {
     const control = this.registerForm.get(name);

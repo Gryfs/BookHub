@@ -26,8 +26,8 @@
         >Catalogue</a
       >
       <a routerLink="/books/search" routerLinkActive="active" (click)="closeMenu()">Recherche</a>
-      @if (!session.isLoggedIn()) {
-        <a routerLink="/login" routerLinkActive="active" (click)="closeMenu()">Connexion</a>
+      @if (session.isLoggedIn()) {
+        <a routerLink="/profile" routerLinkActive="active" (click)="closeMenu()">Profil</a>
       }
     </nav>
 

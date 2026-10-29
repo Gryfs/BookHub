@@ -13,7 +13,6 @@ const marie: User = {
   email: 'marie.lectrice@example.fr',
   firstName: 'Marie',
   lastName: 'Dupont',
-  pseudonym: 'MarieLit',
   role: 'USER',
 };
 
@@ -35,9 +34,9 @@ describe('Session', () => {
     expect(session.homeUrl()).toBe('/dashboard');
   });
 
-  it('retrouve la session au rechargement de la page', () => {
-    localStorage.setItem('bookhub.token', fakeToken(3600));
-    localStorage.setItem('bookhub.user', JSON.stringify(marie));
+  it('retrouve la session au rechargement de la page (même onglet)', () => {
+    sessionStorage.setItem('bookhub.token', fakeToken(3600));
+    sessionStorage.setItem('bookhub.user', JSON.stringify(marie));
 
     const session = TestBed.inject(Session);
 
@@ -45,13 +44,13 @@ describe('Session', () => {
   });
 
   it('ignore une session dont le jeton a expiré', () => {
-    localStorage.setItem('bookhub.token', fakeToken(-60));
-    localStorage.setItem('bookhub.user', JSON.stringify(marie));
+    sessionStorage.setItem('bookhub.token', fakeToken(-60));
+    sessionStorage.setItem('bookhub.user', JSON.stringify(marie));
 
     const session = TestBed.inject(Session);
 
     expect(session.isLoggedIn()).toBe(false);
-    expect(localStorage.getItem('bookhub.token')).toBeNull();
+    expect(sessionStorage.getItem('bookhub.token')).toBeNull();
   });
 
   it('respecte la hiérarchie des rôles', () => {

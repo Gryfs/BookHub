@@ -1,0 +1,86 @@
+<h1>Mon profil</h1>
+@if (profile(); as profile) {
+  <p class="subtitle">{{ profile.email }}</p>
+}
+
+@if (passwordChanged()) {
+  <div class="alert alert-success">Votre mot de passe a été modifié.</div>
+}
+@if (successMessage()) {
+  <div class="alert alert-success">{{ successMessage() }}</div>
+}
+@if (errorMessage()) {
+  <div class="alert alert-error">{{ errorMessage() }}</div>
+}
+
+<div class="profile-grid">
+  <section class="card">
+    <h2>Informations personnelles</h2>
+
+    <form [formGroup]="profileForm" (ngSubmit)="onSubmit()" novalidate>
+      <div class="field">
+        <label for="firstName">Prénom</label>
+        <input id="firstName" type="text" formControlName="firstName" autocomplete="given-name" />
+        @if (isInvalid('firstName')) {
+          <p class="field-error">Le prénom est obligatoire.</p>
+        }
+      </div>
+
+      <div class="field">
+        <label for="lastName">Nom</label>
+        <input id="lastName" type="text" formControlName="lastName" autocomplete="family-name" />
+        @if (isInvalid('lastName')) {
+          <p class="field-error">Le nom est obligatoire.</p>
+        }
+      </div>
+
+      <div class="field">
+        <label for="phone">Téléphone <span class="optional">(facultatif)</span></label>
+        <input
+          id="phone"
+          type="tel"
+          formControlName="phone"
+          autocomplete="tel"
+          placeholder="06 12 34 56 78"
+        />
+        @if (isInvalid('phone')) {
+          <p class="field-error">Le numéro de téléphone n'est pas valide.</p>
+        }
+      </div>
+
+      <div class="field">
+        <label for="displayMode">Affichage des avis</label>
+        <select id="displayMode" formControlName="displayMode">
+          <option value="name">Nom réel « {{ realName() }} »</option>
+          <option value="pseudonym">Pseudonyme</option>
+        </select>
+      </div>
+
+      @if (profileForm.controls.displayMode.value === 'pseudonym') {
+        <div class="field">
+          <label for="pseudonym">Pseudonyme</label>
+          <input id="pseudonym" type="text" formControlName="pseudonym" />
+          @if (isInvalid('pseudonym')) {
+            <p class="field-error">Le pseudonyme est obligatoire (50 caractères maximum).</p>
+          }
+        </div>
+      }
+
+      <button type="submit" class="btn btn-primary" [disabled]="saving()">Enregistrer</button>
+    </form>
+  </section>
+
+  <div class="side">
+    <section class="card">
+      <h2>Sécurité</h2>
+      <a class="btn btn-outline" routerLink="/profile/password">Changer le mot de passe</a>
+    </section>
+
+    <section class="card">
+      <h2>Données personnelles (RGPD)</h2>
+      <p>Suppression définitive de votre compte, avec confirmation.</p>
+      <a class="btn btn-danger" routerLink="/profile/delete">Supprimer mon compte</a>
+      <p class="hint">Impossible tant qu'un emprunt est en cours.</p>
+    </section>
+  </div>
+</div>

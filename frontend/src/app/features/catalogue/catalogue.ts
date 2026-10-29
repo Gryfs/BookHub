@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, input } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 
@@ -10,6 +10,8 @@ import { Router } from '@angular/router';
 })
 export class Catalogue {
   private readonly router = inject(Router);
+
+  readonly accountDeleted = input<string>();
 
   protected readonly searchForm = new FormGroup({
     query: new FormControl('', { nonNullable: true }),

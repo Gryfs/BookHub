@@ -5,8 +5,12 @@ export interface User {
   email: string;
   firstName: string;
   lastName: string;
-  pseudonym: string | null;
   role: Role;
+}
+
+export interface Profile extends User {
+  phone: string | null;
+  pseudonym: string | null;
 }
 
 export interface LoginRequest {
@@ -25,4 +29,16 @@ export interface RegisterRequest {
   email: string;
   password: string;
   consent: boolean;
+}
+
+export interface UpdateProfileRequest {
+  firstName: string;
+  lastName: string;
+  phone: string;
+  pseudonym: string;
+}
+
+export interface ChangePasswordRequest {
+  currentPassword: string;
+  newPassword: string;
 }

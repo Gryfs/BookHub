@@ -26,6 +26,6 @@ export class Auth {
 
   logout(): void {
     this.session.clear();
-    this.router.navigate(['/books']);
+    this.router.navigate(['/login']);
   }
 }

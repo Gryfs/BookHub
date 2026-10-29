@@ -91,7 +91,7 @@ class AuthControllerTest {
         .andReturn().getResponse().getContentAsString();
     String token = JsonPath.read(response, "$.token");
 
-    mockMvc.perform(get("/api/auth/me").header(HttpHeaders.AUTHORIZATION, "Bearer " + token))
+    mockMvc.perform(get("/api/users/me").header(HttpHeaders.AUTHORIZATION, "Bearer " + token))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.email").value("marie.lectrice@example.fr"))
         .andExpect(jsonPath("$.role").value("USER"));
@@ -117,7 +117,7 @@ class AuthControllerTest {
 
   @Test
   void meWithoutTokenReturns401ProblemDetail() throws Exception {
-    mockMvc.perform(get("/api/auth/me"))
+    mockMvc.perform(get("/api/users/me"))
         .andExpect(status().isUnauthorized())
         .andExpect(content().contentType(MediaType.APPLICATION_PROBLEM_JSON))
         .andExpect(jsonPath("$.status").value(401));
@@ -125,7 +125,7 @@ class AuthControllerTest {
 
   @Test
   void meWithInvalidTokenReturns401() throws Exception {
-    mockMvc.perform(get("/api/auth/me").header(HttpHeaders.AUTHORIZATION, "Bearer faux.jeton.jwt"))
+    mockMvc.perform(get("/api/users/me").header(HttpHeaders.AUTHORIZATION, "Bearer faux.jeton.jwt"))
         .andExpect(status().isUnauthorized());
   }
 

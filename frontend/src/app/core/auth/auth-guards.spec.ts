@@ -11,28 +11,31 @@ const marie: User = {
   email: 'marie.lectrice@example.fr',
   firstName: 'Marie',
   lastName: 'Dupont',
-  pseudonym: null,
   role: 'USER',
 };
 
-describe('Guards', () => {
-  let session: Session;
-  let router: Router;
+function fakeToken(expiresInSeconds: number): string {
+  const payload = btoa(JSON.stringify({ exp: Math.floor(Date.now() / 1000) + expiresInSeconds }));
+  return `header.${payload}.signature`;
+}
 
-  beforeEach(() => {
+describe('Guards', () => {
+  function setup(): { session: Session; router: Router } {
     TestBed.configureTestingModule({ providers: [provideRouter(routes)] });
-    session = TestBed.inject(Session);
-    router = TestBed.inject(Router);
-  });
+    return { session: TestBed.inject(Session), router: TestBed.inject(Router) };
+  }
 
   it('renvoie un visiteur vers la connexion', async () => {
+    const { router } = setup();
+
     await RouterTestingHarness.create('/dashboard');
 
     expect(router.url).toBe('/login');
   });
 
   it('laisse un lecteur accéder à son tableau de bord', async () => {
-    session.start('jwt-123', marie);
+    const { session, router } = setup();
+    session.start(fakeToken(3600), marie);
 
     await RouterTestingHarness.create('/dashboard');
 
@@ -40,7 +43,8 @@ describe('Guards', () => {
   });
 
   it("refuse l'espace bibliothécaire à un lecteur", async () => {
-    session.start('jwt-123', marie);
+    const { session, router } = setup();
+    session.start(fakeToken(3600), marie);
 
     await RouterTestingHarness.create('/librarian');
 
@@ -48,7 +52,8 @@ describe('Guards', () => {
   });
 
   it("laisse un administrateur accéder à l'espace bibliothécaire", async () => {
-    session.start('jwt-123', { ...marie, role: 'ADMIN' });
+    const { session, router } = setup();
+    session.start(fakeToken(3600), { ...marie, role: 'ADMIN' });
 
     await RouterTestingHarness.create('/librarian');
 
@@ -56,10 +61,31 @@ describe('Guards', () => {
   });
 
   it("renvoie un utilisateur connecté vers son espace s'il ouvre la connexion", async () => {
-    session.start('jwt-123', marie);
+    const { session, router } = setup();
+    session.start(fakeToken(3600), marie);
 
     await RouterTestingHarness.create('/login');
 
     expect(router.url).toBe('/dashboard');
+  });
+
+  it("affiche l'écran de session expirée si le jeton expire pendant la navigation", async () => {
+    const { session, router } = setup();
+    session.start(fakeToken(-60), marie);
+
+    await RouterTestingHarness.create('/dashboard');
+
+    expect(router.url).toBe('/login?expired=1');
+    expect(session.isLoggedIn()).toBe(false);
+  });
+
+  it("affiche l'écran de session expirée si le jeton a expiré avant l'ouverture de l'appli", async () => {
+    sessionStorage.setItem('bookhub.token', fakeToken(-60));
+    sessionStorage.setItem('bookhub.user', JSON.stringify(marie));
+    const { router } = setup();
+
+    await RouterTestingHarness.create('/dashboard');
+
+    expect(router.url).toBe('/login?expired=1');
   });
 });

@@ -1,6 +1,6 @@
 import { Routes } from '@angular/router';
 
-import { guestGuard, roleGuard } from './core/auth/auth-guards';
+import { authGuard, guestGuard, roleGuard } from './core/auth/auth-guards';
 import { Layout } from './core/layout/layout';
 
 export const routes: Routes = [
@@ -46,6 +46,28 @@ export const routes: Routes = [
         canActivate: [roleGuard('ADMIN')],
         data: { heading: 'Administration' },
         loadComponent: () => import('./features/dashboard/dashboard').then((m) => m.Dashboard),
+      },
+      {
+        path: 'profile',
+        title: 'Mon profil · BookHub',
+        canActivate: [authGuard],
+        loadComponent: () => import('./features/profile/profile').then((m) => m.Profile),
+      },
+      {
+        path: 'profile/password',
+        title: 'Changer le mot de passe · BookHub',
+        canActivate: [authGuard],
+        loadComponent: () =>
+          import('./features/profile/change-password/change-password').then(
+            (m) => m.ChangePassword,
+          ),
+      },
+      {
+        path: 'profile/delete',
+        title: 'Supprimer mon compte · BookHub',
+        canActivate: [authGuard],
+        loadComponent: () =>
+          import('./features/profile/delete-account/delete-account').then((m) => m.DeleteAccount),
       },
       {
         path: 'access-denied',

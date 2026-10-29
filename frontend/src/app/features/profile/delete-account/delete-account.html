@@ -1,0 +1,38 @@
+<div class="card auth-card">
+  <h1>Supprimer mon compte</h1>
+
+  <div class="alert alert-warning">Action irréversible : droit à l'oubli (RGPD).</div>
+
+  <p>
+    Vos réservations et vos avis seront supprimés et votre compte sera anonymisé. L'historique de
+    vos emprunts est conservé de façon anonyme pour les statistiques de la bibliothèque.
+  </p>
+
+  @if (errorMessage()) {
+    <div class="alert alert-error">{{ errorMessage() }}</div>
+  }
+
+  <div class="field">
+    <label for="emailConfirmation">Confirmez en saisissant votre adresse email</label>
+    <input
+      id="emailConfirmation"
+      type="email"
+      [formControl]="emailConfirmation"
+      autocomplete="off"
+    />
+  </div>
+
+  <div class="actions">
+    <button
+      type="button"
+      class="btn btn-danger"
+      [disabled]="!isConfirmed() || deleting()"
+      (click)="onDelete()"
+    >
+      Supprimer définitivement
+    </button>
+    <a class="btn btn-outline" routerLink="/profile">Annuler</a>
+  </div>
+
+  <p class="hint">La suppression est impossible tant qu'un emprunt est en cours.</p>
+</div>

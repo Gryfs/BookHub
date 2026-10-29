@@ -26,10 +26,10 @@ class MemoryStorage implements Storage {
   }
 }
 
-Object.defineProperty(globalThis, 'localStorage', {
+Object.defineProperty(globalThis, 'sessionStorage', {
   value: new MemoryStorage(),
   configurable: true,
   writable: true,
 });
 
-beforeEach(() => localStorage.clear());
+beforeEach(() => sessionStorage.clear());

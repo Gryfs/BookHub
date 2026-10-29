@@ -26,7 +26,7 @@ describe('Header', () => {
   }
 
   it('affiche les liens du visiteur', () => {
-    expect(navLinks()).toEqual(['Catalogue', 'Recherche', 'Connexion']);
+    expect(navLinks()).toEqual(['Catalogue', 'Recherche']);
     expect(element.querySelector('.account')?.textContent).toContain('Visiteur');
   });
 
@@ -36,12 +36,11 @@ describe('Header', () => {
       email: 'ahmed.biblio@quartier-solidaire.fr',
       firstName: 'Ahmed',
       lastName: 'Benali',
-      pseudonym: null,
       role: 'LIBRARIAN',
     });
     await fixture.whenStable();
 
-    expect(navLinks()).toEqual(['Pilotage', 'Catalogue', 'Recherche']);
+    expect(navLinks()).toEqual(['Pilotage', 'Catalogue', 'Recherche', 'Profil']);
     expect(element.querySelector('.account')?.textContent).toContain('Ahmed B. · LIBRARIAN');
   });
 
@@ -51,7 +50,6 @@ describe('Header', () => {
       email: 'marie.lectrice@example.fr',
       firstName: 'Marie',
       lastName: 'Dupont',
-      pseudonym: null,
       role: 'USER',
     });
     await fixture.whenStable();

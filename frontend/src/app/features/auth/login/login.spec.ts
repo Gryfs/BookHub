@@ -57,7 +57,6 @@ describe('Login', () => {
         email: 'marie.lectrice@example.fr',
         firstName: 'Marie',
         lastName: 'Dupont',
-        pseudonym: null,
         role: 'USER',
       },
     });

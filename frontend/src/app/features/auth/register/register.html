@@ -36,10 +36,7 @@
     <div class="field">
       <label for="password">Mot de passe</label>
       <input id="password" type="password" formControlName="password" autocomplete="new-password" />
-      <p class="hint">
-        Au moins 12 caractères, avec une majuscule, une minuscule, un chiffre et un caractère
-        spécial.
-      </p>
+      <p class="hint">{{ passwordHint }}</p>
       @if (isInvalid('password')) {
         <p class="field-error">Mot de passe trop faible (règles non respectées).</p>
       }

@@ -9,7 +9,6 @@ import fr.eni.bookhub.dto.UserResponse;
 import fr.eni.bookhub.repository.UserRepository;
 import fr.eni.bookhub.security.JwtService;
 import fr.eni.bookhub.service.exception.BusinessRuleException;
-import fr.eni.bookhub.service.exception.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -51,13 +50,6 @@ public class AuthService {
     }
 
     return new LoginResponse(jwtService.generateToken(user), UserResponse.from(user));
-  }
-
-  @Transactional(readOnly = true)
-  public UserResponse getCurrentUser(String email) {
-    return userRepository.findByEmailIgnoreCase(email)
-        .map(UserResponse::from)
-        .orElseThrow(() -> new ResourceNotFoundException("Utilisateur introuvable"));
   }
 
 }

@@ -19,25 +19,45 @@ const HOME_BY_ROLE: Record<Role, string> = {
 
 @Injectable({ providedIn: 'root' })
 export class Session {
+  private expired = false;
   private readonly currentUser = signal<User | null>(this.loadUser());
 
   readonly user = this.currentUser.asReadonly();
   readonly isLoggedIn = computed(() => this.currentUser() !== null);
 
   getToken(): string | null {
-    return localStorage.getItem(TOKEN_KEY);
+    return sessionStorage.getItem(TOKEN_KEY);
   }
 
   start(token: string, user: User): void {
-    localStorage.setItem(TOKEN_KEY, token);
-    localStorage.setItem(USER_KEY, JSON.stringify(user));
+    sessionStorage.setItem(TOKEN_KEY, token);
+    sessionStorage.setItem(USER_KEY, JSON.stringify(user));
+    this.currentUser.set(user);
+  }
+
+  updateUser(user: User): void {
+    sessionStorage.setItem(USER_KEY, JSON.stringify(user));
     this.currentUser.set(user);
   }
 
   clear(): void {
-    localStorage.removeItem(TOKEN_KEY);
-    localStorage.removeItem(USER_KEY);
+    sessionStorage.removeItem(TOKEN_KEY);
+    sessionStorage.removeItem(USER_KEY);
     this.currentUser.set(null);
+  }
+
+  checkExpiration(): void {
+    const token = this.getToken();
+    if (token && isExpired(token)) {
+      this.clear();
+      this.expired = true;
+    }
+  }
+
+  consumeExpired(): boolean {
+    const wasExpired = this.expired;
+    this.expired = false;
+    return wasExpired;
   }
 
   hasRole(role: Role): boolean {
@@ -51,11 +71,12 @@ export class Session {
   }
 
   private loadUser(): User | null {
-    const token = localStorage.getItem(TOKEN_KEY);
-    const user = localStorage.getItem(USER_KEY);
+    const token = sessionStorage.getItem(TOKEN_KEY);
+    const user = sessionStorage.getItem(USER_KEY);
     if (!token || !user || isExpired(token)) {
-      localStorage.removeItem(TOKEN_KEY);
-      localStorage.removeItem(USER_KEY);
+      this.expired = !!token && isExpired(token);
+      sessionStorage.removeItem(TOKEN_KEY);
+      sessionStorage.removeItem(USER_KEY);
       return null;
     }
     return JSON.parse(user) as User;

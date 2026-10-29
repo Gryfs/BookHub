@@ -51,6 +51,19 @@ class OpenApiDocumentationTest {
   }
 
   @Test
+  void searchQueryParametersAreDocumented() throws Exception {
+    mockMvc.perform(get("/v3/api-docs"))
+        .andExpect(jsonPath("$.paths['/api/books/search'].get.description").isNotEmpty())
+        .andExpect(jsonPath("$.paths['/api/books/search'].get.parameters[*].name").value(
+            containsInAnyOrder("q", "categoryId", "available", "sort", "page", "size")))
+        .andExpect(jsonPath("$.paths['/api/books/search'].get.parameters[?(@.name == 'q')].description")
+            .isNotEmpty())
+        .andExpect(jsonPath("$.paths['/api/books/search'].get.responses", hasKey("400")))
+        .andExpect(jsonPath("$.paths['/api/categories'].get.description").isNotEmpty())
+        .andExpect(jsonPath("$.components.schemas", hasKey("CategoryResponse")));
+  }
+
+  @Test
   void everyEndpointExplainsWhatItIsFor() throws Exception {
     mockMvc.perform(get("/v3/api-docs"))
         .andExpect(jsonPath("$.paths['/api/auth/register'].post.description").isNotEmpty())

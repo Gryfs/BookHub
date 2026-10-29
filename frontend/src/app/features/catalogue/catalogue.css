@@ -31,6 +31,14 @@
   list-style: none;
 }
 
+.book-grid li {
+  display: flex;
+}
+
+.book-grid app-book-card {
+  flex: 1;
+}
+
 .empty {
   padding: 3rem 1rem;
   text-align: center;

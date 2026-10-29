@@ -15,6 +15,11 @@ export const routes: Routes = [
         loadComponent: () => import('./features/catalogue/catalogue').then((m) => m.Catalogue),
       },
       {
+        path: 'books/search',
+        title: 'Recherche · BookHub',
+        loadComponent: () => import('./features/search/search').then((m) => m.Search),
+      },
+      {
         path: 'login',
         title: 'Connexion · BookHub',
         canActivate: [guestGuard],

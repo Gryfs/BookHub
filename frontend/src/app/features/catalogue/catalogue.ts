@@ -3,10 +3,10 @@ import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { Subscription } from 'rxjs';
 
+import { BookApi } from '../../core/api/book-api';
 import { BookSummary } from '../../shared/models/book';
 import { BookCard } from '../../shared/ui/book-card/book-card';
 import { Pagination } from '../../shared/ui/pagination/pagination';
-import { BookApi } from './book-api';
 
 @Component({
   selector: 'app-catalogue',

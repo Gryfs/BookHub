@@ -1,0 +1,85 @@
+<h1>Recherche</h1>
+@if (criteria().q) {
+  <p class="subtitle">Requête : « {{ criteria().q }} », sans tenir compte des majuscules.</p>
+} @else {
+  <p class="subtitle">Cherchez un livre par titre, auteur ou ISBN, et affinez avec les filtres.</p>
+}
+
+<div class="search-layout">
+  <form class="card filters" role="search" [formGroup]="searchForm" (ngSubmit)="onSubmit()">
+    <div class="field">
+      <label for="q">Recherche</label>
+      <input id="q" type="search" formControlName="q" placeholder="Titre, auteur ou ISBN" />
+    </div>
+
+    <div class="field">
+      <label for="categoryId">Catégorie</label>
+      <select id="categoryId" formControlName="categoryId">
+        <option value="">Toutes</option>
+        @for (category of categories(); track category.id) {
+          <option [value]="category.id">{{ category.label }}</option>
+        }
+      </select>
+    </div>
+
+    <div class="field">
+      <label for="available">Disponibilité</label>
+      <select id="available" formControlName="available">
+        <option value="">Tous</option>
+        <option value="true">Disponibles</option>
+        <option value="false">Indisponibles</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label for="sort">Tri</label>
+      <select id="sort" formControlName="sort">
+        <option value="TITLE">Alphabétique</option>
+        <option value="RATING">Mieux notés</option>
+        <option value="RECENT">Plus récents</option>
+      </select>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Appliquer</button>
+  </form>
+
+  <section class="results" aria-live="polite">
+    @if (errorMessage()) {
+      <div class="alert alert-error">{{ errorMessage() }}</div>
+    } @else if (loading()) {
+      <p class="status">Recherche en cours…</p>
+    } @else if (books().length === 0) {
+      <div class="card empty">
+        <p class="empty-title">Aucun livre ne correspond à votre recherche.</p>
+        <p>Modifiez les mots-clés ou les filtres (catégorie, disponibilité).</p>
+        <button type="button" class="btn btn-outline" (click)="resetFilters()">
+          Réinitialiser les filtres
+        </button>
+      </div>
+    } @else {
+      <p class="status">
+        <strong>{{ totalBooks() }} {{ totalBooks() > 1 ? 'résultats' : 'résultat' }}</strong>
+      </p>
+
+      <ul class="result-list">
+        @for (book of books(); track book.id) {
+          <li>
+            <a class="result" [routerLink]="['/books', book.id]">
+              <span class="result-text">
+                <span class="result-title">{{ book.title }}</span>
+                <span class="result-author">{{ book.author }}</span>
+              </span>
+              @if (book.available) {
+                <span class="badge badge-success">Disponible</span>
+              } @else {
+                <span class="badge badge-danger">Indisponible</span>
+              }
+            </a>
+          </li>
+        }
+      </ul>
+
+      <app-pagination [currentPage]="criteria().page" [totalPages]="totalPages()" />
+    }
+  </section>
+</div>

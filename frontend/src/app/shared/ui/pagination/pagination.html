@@ -1,0 +1,42 @@
+@if (totalPages() > 1) {
+  <nav class="pagination" aria-label="Pagination">
+    @if (currentPage() > 1) {
+      <a
+        class="page-link"
+        [routerLink]="[]"
+        [queryParams]="{ page: currentPage() - 1 }"
+        queryParamsHandling="merge"
+        aria-label="Page précédente"
+        >‹</a
+      >
+    }
+
+    @for (page of pages(); track $index) {
+      @if (page === null) {
+        <span class="ellipsis">…</span>
+      } @else if (page === currentPage()) {
+        <span class="page-link current" aria-current="page">{{ page }}</span>
+      } @else {
+        <a
+          class="page-link"
+          [routerLink]="[]"
+          [queryParams]="{ page: page }"
+          queryParamsHandling="merge"
+          [attr.aria-label]="'Page ' + page"
+          >{{ page }}</a
+        >
+      }
+    }
+
+    @if (currentPage() < totalPages()) {
+      <a
+        class="page-link"
+        [routerLink]="[]"
+        [queryParams]="{ page: currentPage() + 1 }"
+        queryParamsHandling="merge"
+        aria-label="Page suivante"
+        >›</a
+      >
+    }
+  </nav>
+}

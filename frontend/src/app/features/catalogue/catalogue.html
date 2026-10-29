@@ -17,10 +17,35 @@
   </form>
 </section>
 
-<div class="card empty">
-  <svg class="empty-icon" viewBox="0 0 24 24" aria-hidden="true">
-    <path d="M4 4.5A2.5 2.5 0 0 1 6.5 2H20v16H6.5a2.5 2.5 0 0 0 0 5H20v-2M6.5 18H20M8 6h8M8 10h6" />
-  </svg>
-  <p class="empty-title">Aucun livre à afficher pour le moment.</p>
-  <p>Le catalogue sera bientôt disponible.</p>
-</div>
+@if (errorMessage()) {
+  <div class="alert alert-error">{{ errorMessage() }}</div>
+} @else if (loading()) {
+  <p class="status" aria-live="polite">Chargement du catalogue…</p>
+} @else if (books().length === 0) {
+  <div class="card empty">
+    <svg class="empty-icon" viewBox="0 0 24 24" aria-hidden="true">
+      <path
+        d="M4 4.5A2.5 2.5 0 0 1 6.5 2H20v16H6.5a2.5 2.5 0 0 0 0 5H20v-2M6.5 18H20M8 6h8M8 10h6"
+      />
+    </svg>
+    @if (currentPage() > 1) {
+      <p class="empty-title">Cette page n'existe pas.</p>
+      <a routerLink="/books">Revenir à la première page</a>
+    } @else {
+      <p class="empty-title">Aucun livre dans le catalogue pour le moment.</p>
+    }
+  </div>
+} @else {
+  <p class="status">
+    {{ totalBooks() }} {{ totalBooks() > 1 ? 'livres' : 'livre' }} · page {{ currentPage() }} sur
+    {{ totalPages() }}
+  </p>
+
+  <ul class="book-grid">
+    @for (book of books(); track book.id) {
+      <li><app-book-card [book]="book" /></li>
+    }
+  </ul>
+
+  <app-pagination [currentPage]="currentPage()" [totalPages]="totalPages()" />
+}

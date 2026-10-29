@@ -1,0 +1,25 @@
+<a class="book-card" [routerLink]="['/books', book().id]">
+  <div class="cover">
+    @if (book().coverUrl) {
+      <img [src]="book().coverUrl" [alt]="'Couverture de ' + book().title" loading="lazy" />
+    } @else {
+      <div class="cover-placeholder" aria-hidden="true">
+        <svg viewBox="0 0 24 24">
+          <path
+            d="M4 4.5A2.5 2.5 0 0 1 6.5 2H20v16H6.5a2.5 2.5 0 0 0 0 5H20v-2M6.5 18H20M8 6h8M8 10h6"
+          />
+        </svg>
+      </div>
+    }
+  </div>
+
+  <div class="info">
+    <h2 class="title">{{ book().title }}</h2>
+    <p class="author">{{ book().author }}</p>
+    @if (book().available) {
+      <span class="badge badge-success">Disponible</span>
+    } @else {
+      <span class="badge badge-danger">Indisponible</span>
+    }
+  </div>
+</a>

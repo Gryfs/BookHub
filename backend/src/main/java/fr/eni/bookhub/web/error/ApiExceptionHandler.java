@@ -9,6 +9,7 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.core.PropertyReferenceException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -61,6 +62,12 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
         "Un ou plusieurs champs sont invalides.");
     problem.setProperty("errors", Map.of(ex.getField(), ex.getMessage()));
     return problem;
+  }
+
+  @ExceptionHandler(PropertyReferenceException.class)
+  public ProblemDetail handleUnknownSortProperty(PropertyReferenceException ex) {
+    return problem(HttpStatus.BAD_REQUEST, "Paramètre invalide",
+        "Tri impossible sur le champ « " + ex.getPropertyName() + " ».");
   }
 
   @ExceptionHandler(BadCredentialsException.class)

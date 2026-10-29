@@ -14,6 +14,11 @@ spring:
   flyway:
     locations: classpath:db/migration
 
+  data:
+    web:
+      pageable:
+        max-page-size: 100
+
   jpa:
     # Le schéma est géré par Flyway : Hibernate le vérifie sans le modifier
     hibernate:

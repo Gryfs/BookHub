@@ -1,5 +1,6 @@
 package fr.eni.bookhub.config;
 
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.hasKey;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -34,7 +35,19 @@ class OpenApiDocumentationTest {
         .andExpect(jsonPath("$.paths['/api/users/me'].get.responses", hasKey("401")))
         .andExpect(jsonPath("$.paths['/api/users/me'].put.responses", hasKey("400")))
         .andExpect(jsonPath("$.paths['/api/users/me/password'].put.responses", hasKey("204")))
-        .andExpect(jsonPath("$.paths['/api/users/me'].delete.responses", hasKey("409")));
+        .andExpect(jsonPath("$.paths['/api/users/me'].delete.responses", hasKey("409")))
+        .andExpect(jsonPath("$.paths['/api/books'].get.responses", hasKey("200")))
+        .andExpect(jsonPath("$.paths['/api/books'].get.responses", hasKey("400")));
+  }
+
+  @Test
+  void catalogueShowsPaginationParametersAndIsPublic() throws Exception {
+    mockMvc.perform(get("/v3/api-docs"))
+        .andExpect(jsonPath("$.paths['/api/books'].get.description").isNotEmpty())
+        .andExpect(jsonPath("$.paths['/api/books'].get.parameters[*].name").value(
+            containsInAnyOrder("page", "size", "sort")))
+        .andExpect(jsonPath("$.paths['/api/books'].get.security").doesNotExist())
+        .andExpect(jsonPath("$.components.schemas", hasKey("BookSummaryResponse")));
   }
 
   @Test

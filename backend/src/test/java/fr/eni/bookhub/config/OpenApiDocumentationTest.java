@@ -37,7 +37,11 @@ class OpenApiDocumentationTest {
         .andExpect(jsonPath("$.paths['/api/users/me/password'].put.responses", hasKey("204")))
         .andExpect(jsonPath("$.paths['/api/users/me'].delete.responses", hasKey("409")))
         .andExpect(jsonPath("$.paths['/api/books'].get.responses", hasKey("200")))
-        .andExpect(jsonPath("$.paths['/api/books'].get.responses", hasKey("400")));
+        .andExpect(jsonPath("$.paths['/api/books'].get.responses", hasKey("400")))
+        .andExpect(jsonPath("$.paths['/api/books/{id}'].get.responses", hasKey("200")))
+        .andExpect(jsonPath("$.paths['/api/books/{id}'].get.responses", hasKey("404")))
+        .andExpect(jsonPath("$.paths['/api/loans'].post.responses", hasKey("201")))
+        .andExpect(jsonPath("$.paths['/api/loans/my'].get.responses", hasKey("200")));
   }
 
   @Test
@@ -60,6 +64,8 @@ class OpenApiDocumentationTest {
             .isNotEmpty())
         .andExpect(jsonPath("$.paths['/api/books/search'].get.responses", hasKey("400")))
         .andExpect(jsonPath("$.paths['/api/categories'].get.description").isNotEmpty())
+        .andExpect(jsonPath("$.paths['/api/books/{id}'].get.description").isNotEmpty())
+        .andExpect(jsonPath("$.components.schemas", hasKey("BookDetailResponse")))
         .andExpect(jsonPath("$.components.schemas", hasKey("CategoryResponse")));
   }
 

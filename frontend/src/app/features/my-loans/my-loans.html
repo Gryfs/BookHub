@@ -1,0 +1,69 @@
+<h1>Mes emprunts</h1>
+<p class="subtitle">Suivez vos livres en cours et votre historique.</p>
+
+@if (errorMessage()) {
+  <div class="alert alert-error">{{ errorMessage() }}</div>
+} @else if (loading()) {
+  <p class="muted">Chargement…</p>
+} @else {
+  <div class="tabs" role="tablist">
+    <button
+      type="button"
+      role="tab"
+      [class.active]="tab() === 'current'"
+      (click)="tab.set('current')"
+    >
+      En cours ({{ current().length }})
+    </button>
+    <button
+      type="button"
+      role="tab"
+      [class.active]="tab() === 'history'"
+      (click)="tab.set('history')"
+    >
+      Historique ({{ history().length }})
+    </button>
+  </div>
+
+  @if (tab() === 'current') {
+    @if (current().length === 0) {
+      <div class="card empty">
+        <p>Aucun emprunt en cours.</p>
+        <a routerLink="/books" class="btn btn-primary">Parcourir le catalogue</a>
+      </div>
+    } @else {
+      <ul class="loan-list">
+        @for (loan of current(); track loan.id) {
+          <li class="card" [class.late]="isLate(loan)">
+            <div class="loan-head">
+              <a [routerLink]="['/books', loan.bookId]">{{ loan.bookTitle }}</a>
+              @if (isLate(loan)) {
+                <span class="badge badge-danger">En retard</span>
+              } @else {
+                <span class="badge badge-success">En cours</span>
+              }
+            </div>
+            <p class="muted">{{ loan.bookAuthor }}</p>
+            <p>À rendre avant le <strong>{{ formatDate(loan.dueDate) }}</strong></p>
+          </li>
+        }
+      </ul>
+    }
+  } @else {
+    @if (history().length === 0) {
+      <p class="muted">Aucun emprunt terminé pour le moment.</p>
+    } @else {
+      <ul class="loan-list">
+        @for (loan of history(); track loan.id) {
+          <li class="card">
+            <a [routerLink]="['/books', loan.bookId]">{{ loan.bookTitle }}</a>
+            <p class="muted">
+              Emprunté le {{ formatDate(loan.loanDate) }} · rendu le
+              {{ loan.returnDate ? formatDate(loan.returnDate) : '—' }}
+            </p>
+          </li>
+        }
+      </ul>
+    }
+  }
+}

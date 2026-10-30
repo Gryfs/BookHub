@@ -3,7 +3,7 @@ import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 
 import { environment } from '../../../environments/environment';
-import { BookSearchCriteria, BookSummary, Category } from '../../shared/models/book';
+import { BookDetail, BookSearchCriteria, BookSummary, Category } from '../../shared/models/book';
 import { Page } from '../../shared/models/page';
 
 export const BOOKS_PER_PAGE = 20;
@@ -40,5 +40,9 @@ export class BookApi {
 
   getCategories(): Observable<Category[]> {
     return this.http.get<Category[]>(`${this.apiUrl}/categories`);
+  }
+
+  getBook(id: number): Observable<BookDetail> {
+    return this.http.get<BookDetail>(`${this.apiUrl}/books/${id}`);
   }
 }

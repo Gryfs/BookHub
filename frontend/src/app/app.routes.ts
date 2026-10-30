@@ -20,6 +20,18 @@ export const routes: Routes = [
         loadComponent: () => import('./features/search/search').then((m) => m.Search),
       },
       {
+        path: 'books/:id',
+        title: 'Fiche livre · BookHub',
+        loadComponent: () =>
+          import('./features/book-detail/book-detail').then((m) => m.BookDetailPage),
+      },
+      {
+        path: 'loans',
+        title: 'Mes emprunts · BookHub',
+        canActivate: [authGuard],
+        loadComponent: () => import('./features/my-loans/my-loans').then((m) => m.MyLoans),
+      },
+      {
         path: 'login',
         title: 'Connexion · BookHub',
         canActivate: [guestGuard],

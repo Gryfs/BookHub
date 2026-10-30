@@ -6,6 +6,29 @@ export interface BookSummary {
   available: boolean;
 }
 
+export interface BookReview {
+  id: number;
+  authorLabel: string;
+  score: number;
+  comment: string | null;
+}
+
+export interface BookDetail {
+  id: number;
+  isbn: string;
+  title: string;
+  author: string;
+  description: string | null;
+  coverUrl: string | null;
+  publicationYear: number | null;
+  category: Category;
+  availableCopies: number;
+  totalCopies: number;
+  available: boolean;
+  averageRating: number | null;
+  reviews: BookReview[];
+}
+
 export interface Category {
   id: number;
   label: string;

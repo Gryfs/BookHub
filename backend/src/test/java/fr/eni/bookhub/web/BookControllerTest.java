@@ -70,4 +70,23 @@ class BookControllerTest {
         .andExpect(status().isOk());
   }
 
+  @Test
+  void bookDetailIsPublicAndComplete() throws Exception {
+    mockMvc.perform(get("/api/books/4"))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.title").value("Dune"))
+        .andExpect(jsonPath("$.isbn").exists())
+        .andExpect(jsonPath("$.category.label").exists())
+        .andExpect(jsonPath("$.availableCopies").value(0))
+        .andExpect(jsonPath("$.available").value(false))
+        .andExpect(jsonPath("$.reviews").isArray());
+  }
+
+  @Test
+  void unknownBookReturns404() throws Exception {
+    mockMvc.perform(get("/api/books/999999"))
+        .andExpect(status().isNotFound())
+        .andExpect(jsonPath("$.detail").value("Livre introuvable (id 999999)"));
+  }
+
 }

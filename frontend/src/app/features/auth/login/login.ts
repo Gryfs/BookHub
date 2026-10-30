@@ -19,6 +19,7 @@ export class Login {
 
   readonly expired = input<string>();
   readonly registered = input<string>();
+  readonly returnUrl = input<string>();
 
   protected readonly errorMessage = signal('');
   protected readonly loading = signal(false);
@@ -41,7 +42,10 @@ export class Login {
     this.errorMessage.set('');
 
     this.auth.login(this.loginForm.getRawValue()).subscribe({
-      next: () => this.router.navigateByUrl(this.session.homeUrl()),
+      next: () => {
+        const target = this.safeReturnUrl(this.returnUrl()) ?? this.session.homeUrl();
+        this.router.navigateByUrl(target);
+      },
       error: (error: HttpErrorResponse) => {
         this.loading.set(false);
         this.errorMessage.set(
@@ -51,5 +55,12 @@ export class Login {
         );
       },
     });
+  }
+
+  private safeReturnUrl(value: string | undefined): string | null {
+    if (!value || !value.startsWith('/') || value.startsWith('//')) {
+      return null;
+    }
+    return value;
   }
 }

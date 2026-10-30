@@ -27,6 +27,7 @@
       >
       <a routerLink="/books/search" routerLinkActive="active" (click)="closeMenu()">Recherche</a>
       @if (session.isLoggedIn()) {
+        <a routerLink="/loans" routerLinkActive="active" (click)="closeMenu()">Mes emprunts</a>
         <a routerLink="/profile" routerLinkActive="active" (click)="closeMenu()">Profil</a>
       }
     </nav>

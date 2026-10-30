@@ -30,6 +30,8 @@ public interface LoanRepository extends JpaRepository<Loan, Long> {
 
   boolean existsByUserIdAndBookId(Long userId, Long bookId);
 
+  boolean existsByUserIdAndBookIdAndStatusIn(Long userId, Long bookId, Collection<LoanStatus> statuses);
+
   @Query(value = "SELECT fn_marquer_retards()", nativeQuery = true)
   int markLateLoans();
 

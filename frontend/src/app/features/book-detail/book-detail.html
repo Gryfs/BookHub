@@ -1,0 +1,104 @@
+@if (errorMessage()) {
+  <div class="alert alert-error">{{ errorMessage() }}</div>
+  <a routerLink="/books" class="btn btn-outline">Retour au catalogue</a>
+} @else if (loading()) {
+  <p class="status">Chargement de la fiche…</p>
+} @else if (book(); as book) {
+  <nav class="breadcrumb">
+    <a routerLink="/books">Catalogue</a>
+    <span aria-hidden="true">/</span>
+    <span>{{ book.title }}</span>
+  </nav>
+
+  <article class="detail card">
+    <div class="hero">
+      <div class="cover">
+        @if (book.coverUrl) {
+          <img [src]="book.coverUrl" [alt]="'Couverture de ' + book.title" />
+        } @else {
+          <div class="cover-placeholder" aria-hidden="true">📖</div>
+        }
+      </div>
+
+      <div class="meta">
+        <p class="category">{{ book.category.label }}</p>
+        <h1>{{ book.title }}</h1>
+        <p class="author">{{ book.author }}</p>
+        <p class="isbn">ISBN {{ book.isbn }}</p>
+        @if (book.publicationYear) {
+          <p class="year">Paru en {{ book.publicationYear }}</p>
+        }
+
+        <p class="rating">{{ ratingLabel() }}</p>
+
+        @if (book.available) {
+          <span class="badge badge-success">Disponible ({{ book.availableCopies }} exemplaire(s))</span>
+        } @else {
+          <span class="badge badge-danger">Indisponible</span>
+        }
+
+        <div class="actions">
+          @if (actionMessage()) {
+            <div class="alert alert-success">{{ actionMessage() }}</div>
+          }
+          @if (actionError()) {
+            <div class="alert alert-error">{{ actionError() }}</div>
+          }
+          @if (session.isLoggedIn()) {
+            @if (book.available) {
+              <button type="button" class="btn btn-primary" [disabled]="borrowing()" (click)="borrow()">
+                {{ borrowing() ? 'Emprunt…' : 'Emprunter' }}
+              </button>
+            } @else {
+              <p class="reserve-hint">
+                Indisponible — la <strong>réservation</strong> (file d'attente) arrive au Sprint 2 (US-RESA-01).
+              </p>
+            }
+          } @else if (book.available) {
+            <a
+              class="btn btn-primary"
+              routerLink="/login"
+              [queryParams]="{ returnUrl: loginReturnUrl() }"
+              >Emprunter</a
+            >
+          } @else {
+            <a
+              class="btn btn-outline"
+              routerLink="/login"
+              [queryParams]="{ returnUrl: loginReturnUrl() }"
+              >Se connecter pour réserver</a
+            >
+          }
+        </div>
+      </div>
+    </div>
+
+    @if (book.description) {
+      <section class="description">
+        <h2>Résumé</h2>
+        <p>{{ book.description }}</p>
+      </section>
+    }
+
+    <section class="reviews">
+      <h2>Avis des lecteurs</h2>
+      @if (book.reviews.length === 0) {
+        <p class="muted">Aucun avis pour le moment.</p>
+      } @else {
+        <ul>
+          @for (review of book.reviews; track review.id) {
+            <li>
+              <p class="review-head">
+                <strong>{{ review.authorLabel }}</strong>
+                <span>{{ review.score }} / 5</span>
+              </p>
+              @if (review.comment) {
+                <p>{{ review.comment }}</p>
+              }
+            </li>
+          }
+        </ul>
+      }
+    </section>
+  </article>
+}

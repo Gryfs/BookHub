@@ -1,5 +1,6 @@
 package fr.eni.bookhub.web;
 
+import fr.eni.bookhub.dto.BookDetailResponse;
 import fr.eni.bookhub.dto.BookSort;
 import fr.eni.bookhub.dto.BookSummaryResponse;
 import fr.eni.bookhub.dto.ErrorResponse;
@@ -21,6 +22,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -55,6 +57,26 @@ public class BookController {
   public PageResponse<BookSummaryResponse> getCatalogue(
       @ParameterObject @PageableDefault(size = 20, sort = "title", direction = Sort.Direction.ASC) Pageable pageable) {
     return bookService.getCatalogue(pageable);
+  }
+
+  @GetMapping("/{id}")
+  @Operation(summary = "Consulter la fiche détaillée d'un livre",
+      description = """
+          Sert à la page **Détail livre** : informations complètes, note moyenne et avis des lecteurs.
+
+          - Accès : public, aucun jeton nécessaire.
+          - Les exemplaires disponibles permettent d'afficher les boutons Emprunter / Réserver côté interface.
+          """)
+  @ApiResponse(responseCode = "200", description = "Fiche livre")
+  @ApiResponse(responseCode = "404", description = "Livre inconnu",
+      content = @Content(mediaType = "application/problem+json", schema = @Schema(implementation = ErrorResponse.class),
+          examples = @ExampleObject(value = """
+              {"type": "about:blank", "title": "Ressource introuvable", "status": 404,
+               "detail": "Livre introuvable (id 999).", "instance": "/api/books/999"}
+              """)))
+  public BookDetailResponse getBookDetail(
+      @Parameter(description = "Identifiant du livre", example = "4") @PathVariable long id) {
+    return bookService.getBookDetail(id);
   }
 
   @GetMapping("/search")

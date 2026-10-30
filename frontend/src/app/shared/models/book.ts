@@ -43,3 +43,23 @@ export interface BookSearchCriteria {
   sort: BookSort;
   page: number;
 }
+
+export interface BookAdmin {
+  id: number;
+  isbn: string;
+  title: string;
+  author: string;
+  totalCopies: number;
+  availableCopies: number;
+}
+
+export interface BookRequest {
+  title: string;
+  author: string;
+  isbn: string;
+  categoryId: number;
+  description: string;
+  publicationYear: number | null;
+  totalCopies: number;
+  coverUrl: string;
+}

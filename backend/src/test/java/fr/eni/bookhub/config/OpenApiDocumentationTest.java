@@ -104,4 +104,19 @@ class OpenApiDocumentationTest {
         .andExpect(jsonPath("$.components.schemas.UserResponse.properties.passwordHash").doesNotExist());
   }
 
+  @Test
+  void bookManagementIsDocumentedAndProtected() throws Exception {
+    mockMvc.perform(get("/v3/api-docs"))
+        .andExpect(jsonPath("$.paths['/api/books'].post.description").isNotEmpty())
+        .andExpect(jsonPath("$.paths['/api/books'].post.responses", hasKey("201")))
+        .andExpect(jsonPath("$.paths['/api/books'].post.responses", hasKey("403")))
+        .andExpect(jsonPath("$.paths['/api/books'].post.responses", hasKey("409")))
+        .andExpect(jsonPath("$.paths['/api/books/{id}'].put.responses", hasKey("400")))
+        .andExpect(jsonPath("$.paths['/api/books/{id}'].delete.responses", hasKey("409")))
+        .andExpect(jsonPath("$.paths['/api/books/{id}'].delete.security[0]", hasKey("bearerAuth")))
+        .andExpect(jsonPath("$.paths['/api/librarian/books'].get.description").isNotEmpty())
+        .andExpect(jsonPath("$.components.schemas", hasKey("BookRequest")))
+        .andExpect(jsonPath("$.components.schemas", hasKey("BookAdminResponse")));
+  }
+
 }

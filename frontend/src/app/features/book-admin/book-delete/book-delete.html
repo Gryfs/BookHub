@@ -1,0 +1,31 @@
+<div class="card delete-card">
+  <h1>Confirmer la suppression</h1>
+
+  @if (book(); as book) {
+    <p>
+      Supprimer définitivement <strong>« {{ book.title }} »</strong> de {{ book.author }} du
+      catalogue ?
+    </p>
+  }
+
+  <div class="alert alert-warning">
+    Impossible si un emprunt est en cours, ou si le livre a déjà été emprunté (son historique est
+    conservé pour les statistiques).
+  </div>
+
+  @if (errorMessage()) {
+    <div class="alert alert-error">{{ errorMessage() }}</div>
+  }
+
+  <div class="actions">
+    <button
+      type="button"
+      class="btn btn-danger"
+      [disabled]="!book() || deleting()"
+      (click)="onConfirm()"
+    >
+      Confirmer la suppression
+    </button>
+    <a class="btn btn-outline" routerLink="/admin/books">Annuler</a>
+  </div>
+</div>

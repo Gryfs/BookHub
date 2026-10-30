@@ -14,11 +14,7 @@ export const routes: Routes = [
         title: 'Catalogue · BookHub',
         loadComponent: () => import('./features/catalogue/catalogue').then((m) => m.Catalogue),
       },
-      {
-        path: 'books/search',
-        title: 'Recherche · BookHub',
-        loadComponent: () => import('./features/search/search').then((m) => m.Search),
-      },
+      { path: 'books/search', redirectTo: 'books' },
       {
         path: 'books/:id',
         title: 'Fiche livre · BookHub',
@@ -63,6 +59,36 @@ export const routes: Routes = [
         canActivate: [roleGuard('ADMIN')],
         data: { heading: 'Administration' },
         loadComponent: () => import('./features/dashboard/dashboard').then((m) => m.Dashboard),
+      },
+      {
+        path: 'admin/books',
+        title: 'Gestion du catalogue · BookHub',
+        canActivate: [roleGuard('LIBRARIAN')],
+        loadComponent: () =>
+          import('./features/book-admin/book-admin-list/book-admin-list').then(
+            (m) => m.BookAdminList,
+          ),
+      },
+      {
+        path: 'admin/books/new',
+        title: 'Ajouter un ouvrage · BookHub',
+        canActivate: [roleGuard('LIBRARIAN')],
+        loadComponent: () =>
+          import('./features/book-admin/book-form/book-form').then((m) => m.BookForm),
+      },
+      {
+        path: 'admin/books/:id/edit',
+        title: 'Modifier un ouvrage · BookHub',
+        canActivate: [roleGuard('LIBRARIAN')],
+        loadComponent: () =>
+          import('./features/book-admin/book-form/book-form').then((m) => m.BookForm),
+      },
+      {
+        path: 'admin/books/:id/delete',
+        title: 'Supprimer un ouvrage · BookHub',
+        canActivate: [roleGuard('ADMIN')],
+        loadComponent: () =>
+          import('./features/book-admin/book-delete/book-delete').then((m) => m.BookDelete),
       },
       {
         path: 'profile',

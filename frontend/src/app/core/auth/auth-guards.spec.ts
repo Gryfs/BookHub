@@ -1,3 +1,5 @@
+import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 import { provideRouter, Router } from '@angular/router';
 import { RouterTestingHarness } from '@angular/router/testing';
@@ -21,7 +23,9 @@ function fakeToken(expiresInSeconds: number): string {
 
 describe('Guards', () => {
   function setup(): { session: Session; router: Router } {
-    TestBed.configureTestingModule({ providers: [provideRouter(routes)] });
+    TestBed.configureTestingModule({
+      providers: [provideRouter(routes), provideHttpClient(), provideHttpClientTesting()],
+    });
     return { session: TestBed.inject(Session), router: TestBed.inject(Router) };
   }
 
@@ -87,5 +91,32 @@ describe('Guards', () => {
     await RouterTestingHarness.create('/dashboard');
 
     expect(router.url).toBe('/login?expired=1');
+  });
+
+  it('refuse la gestion du catalogue à un lecteur', async () => {
+    const { session, router } = setup();
+    session.start(fakeToken(3600), marie);
+
+    await RouterTestingHarness.create('/admin/books');
+
+    expect(router.url).toBe('/access-denied');
+  });
+
+  it('ouvre la gestion du catalogue au bibliothécaire', async () => {
+    const { session, router } = setup();
+    session.start(fakeToken(3600), { ...marie, role: 'LIBRARIAN' });
+
+    await RouterTestingHarness.create('/admin/books/new');
+
+    expect(router.url).toBe('/admin/books/new');
+  });
+
+  it('réserve la suppression d’un livre à l’administrateur', async () => {
+    const { session, router } = setup();
+    session.start(fakeToken(3600), { ...marie, role: 'LIBRARIAN' });
+
+    await RouterTestingHarness.create('/admin/books/7/delete');
+
+    expect(router.url).toBe('/access-denied');
   });
 });

@@ -13,14 +13,6 @@ export class BookApi {
   private readonly http = inject(HttpClient);
   private readonly apiUrl = environment.apiUrl;
 
-  getCatalogue(page: number): Observable<Page<BookSummary>> {
-    const params = new HttpParams()
-      .set('page', page)
-      .set('size', BOOKS_PER_PAGE)
-      .set('sort', 'title,asc');
-    return this.http.get<Page<BookSummary>>(`${this.apiUrl}/books`, { params });
-  }
-
   search(criteria: BookSearchCriteria): Observable<Page<BookSummary>> {
     let params = new HttpParams()
       .set('sort', criteria.sort)

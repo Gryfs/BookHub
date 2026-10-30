@@ -23,6 +23,12 @@ describe('Routing racine', () => {
     expect(page.querySelector('h1')?.textContent).toContain('Catalogue des ouvrages');
   });
 
+  it("redirige l'ancienne page de recherche vers le catalogue en gardant la recherche", async () => {
+    await RouterTestingHarness.create('/books/search?q=camus');
+
+    expect(TestBed.inject(Router).url).toBe('/books?q=camus');
+  });
+
   it('affiche la page introuvable pour une URL inconnue', async () => {
     const harness = await RouterTestingHarness.create('/nexiste-pas');
 

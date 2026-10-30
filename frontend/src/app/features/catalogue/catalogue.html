@@ -2,50 +2,101 @@
   <div class="alert alert-success">Votre compte a bien été supprimé.</div>
 }
 
-<section class="intro">
-  <h1>Catalogue des ouvrages</h1>
-  <p class="subtitle">Parcourez les livres de la bibliothèque, sans avoir besoin de compte.</p>
-
-  <form class="search" role="search" [formGroup]="searchForm" (ngSubmit)="onSearch()">
-    <input
-      type="search"
-      aria-label="Rechercher un livre"
-      placeholder="Rechercher un titre, un auteur, un ISBN…"
-      formControlName="query"
-    />
-    <button type="submit" class="btn btn-primary">Rechercher</button>
-  </form>
-</section>
-
-@if (errorMessage()) {
-  <div class="alert alert-error">{{ errorMessage() }}</div>
-} @else if (loading()) {
-  <p class="status" aria-live="polite">Chargement du catalogue…</p>
-} @else if (books().length === 0) {
-  <div class="card empty">
-    <svg class="empty-icon" viewBox="0 0 24 24" aria-hidden="true">
-      <path
-        d="M4 4.5A2.5 2.5 0 0 1 6.5 2H20v16H6.5a2.5 2.5 0 0 0 0 5H20v-2M6.5 18H20M8 6h8M8 10h6"
-      />
-    </svg>
-    @if (currentPage() > 1) {
-      <p class="empty-title">Cette page n'existe pas.</p>
-      <a routerLink="/books">Revenir à la première page</a>
-    } @else {
-      <p class="empty-title">Aucun livre dans le catalogue pour le moment.</p>
-    }
-  </div>
+<h1>Catalogue des ouvrages</h1>
+@if (criteria().q) {
+  <p class="subtitle">Recherche : « {{ criteria().q }} », sans tenir compte des majuscules.</p>
 } @else {
-  <p class="status">
-    {{ totalBooks() }} {{ totalBooks() > 1 ? 'livres' : 'livre' }} · page {{ currentPage() }} sur
-    {{ totalPages() }}
+  <p class="subtitle">
+    Parcourez les livres de la bibliothèque, sans avoir besoin de compte. Cherchez par titre, auteur
+    ou ISBN et affinez avec les filtres.
   </p>
-
-  <ul class="book-grid">
-    @for (book of books(); track book.id) {
-      <li><app-book-card [book]="book" /></li>
-    }
-  </ul>
-
-  <app-pagination [currentPage]="currentPage()" [totalPages]="totalPages()" />
 }
+
+<div class="catalogue-layout">
+  <form class="card filters" role="search" [formGroup]="searchForm" (ngSubmit)="applyFilters()">
+    <div class="field">
+      <label for="q">Recherche</label>
+      <input id="q" type="search" formControlName="q" placeholder="Titre, auteur ou ISBN" />
+    </div>
+
+    <div class="field">
+      <label for="categoryId">Catégorie</label>
+      <select id="categoryId" formControlName="categoryId">
+        <option value="">Toutes</option>
+        @for (category of categories(); track category.id) {
+          <option [value]="category.id">{{ category.label }}</option>
+        }
+      </select>
+    </div>
+
+    <div class="field">
+      <label for="available">Disponibilité</label>
+      <select id="available" formControlName="available">
+        <option value="">Tous</option>
+        <option value="true">Disponibles</option>
+        <option value="false">Indisponibles</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label for="sort">Tri</label>
+      <select id="sort" formControlName="sort">
+        <option value="TITLE">Alphabétique</option>
+        <option value="RATING">Mieux notés</option>
+        <option value="RECENT">Plus récents</option>
+      </select>
+    </div>
+
+    <p class="hint">Les résultats se mettent à jour pendant la saisie.</p>
+    @if (hasFilters()) {
+      <button type="button" class="btn btn-outline" (click)="resetFilters()">
+        Réinitialiser les filtres
+      </button>
+    }
+  </form>
+
+  <section class="results" aria-live="polite" [class.refreshing]="loading()">
+    @if (errorMessage()) {
+      <div class="alert alert-error">{{ errorMessage() }}</div>
+    } @else if (loading() && books().length === 0) {
+      <p class="status">Chargement du catalogue…</p>
+    } @else if (books().length === 0) {
+      <div class="card empty">
+        <svg class="empty-icon" viewBox="0 0 24 24" aria-hidden="true">
+          <path
+            d="M4 4.5A2.5 2.5 0 0 1 6.5 2H20v16H6.5a2.5 2.5 0 0 0 0 5H20v-2M6.5 18H20M8 6h8M8 10h6"
+          />
+        </svg>
+        @if (hasFilters()) {
+          <p class="empty-title">Aucun livre ne correspond à votre recherche.</p>
+          <p>Modifiez les mots-clés ou les filtres (catégorie, disponibilité).</p>
+          <button type="button" class="btn btn-outline" (click)="resetFilters()">
+            Réinitialiser les filtres
+          </button>
+        } @else if (criteria().page > 1) {
+          <p class="empty-title">Cette page n'existe pas.</p>
+          <button type="button" class="btn btn-outline" (click)="resetFilters()">
+            Revenir à la première page
+          </button>
+        } @else {
+          <p class="empty-title">Aucun livre dans le catalogue pour le moment.</p>
+        }
+      </div>
+    } @else {
+      <p class="status">
+        <strong>{{ totalBooks() }} {{ totalBooks() > 1 ? 'livres' : 'livre' }}</strong>
+        @if (totalPages() > 1) {
+          · page {{ criteria().page }} sur {{ totalPages() }}
+        }
+      </p>
+
+      <ul class="book-grid">
+        @for (book of books(); track book.id) {
+          <li><app-book-card [book]="book" /></li>
+        }
+      </ul>
+
+      <app-pagination [currentPage]="criteria().page" [totalPages]="totalPages()" />
+    }
+  </section>
+</div>

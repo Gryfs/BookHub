@@ -1,0 +1,112 @@
+<h1>{{ isEdit() ? 'Modifier un ouvrage' : 'Ajouter un ouvrage' }}</h1>
+<p class="subtitle">Les champs marqués d'un astérisque (*) sont obligatoires.</p>
+
+@if (errorMessage()) {
+  <div class="alert alert-error">{{ errorMessage() }}</div>
+}
+
+@if (loading()) {
+  <p class="status">Chargement du livre…</p>
+} @else {
+  <form class="card" [formGroup]="bookForm" (ngSubmit)="onSubmit()" novalidate>
+    <div class="form-grid">
+      <div class="column">
+        <div class="field">
+          <label for="title">Titre *</label>
+          <input id="title" type="text" formControlName="title" />
+          @if (errorFor('title'); as message) {
+            <p class="field-error">{{ message }}</p>
+          }
+        </div>
+
+        <div class="field">
+          <label for="author">Auteur *</label>
+          <input id="author" type="text" formControlName="author" />
+          @if (errorFor('author'); as message) {
+            <p class="field-error">{{ message }}</p>
+          }
+        </div>
+
+        <div class="field">
+          <label for="isbn">ISBN * <span class="optional">(unique, 13 chiffres)</span></label>
+          <input id="isbn" type="text" formControlName="isbn" placeholder="978-2-07-041080-4" />
+          @if (errorFor('isbn'); as message) {
+            <p class="field-error">{{ message }}</p>
+          }
+        </div>
+
+        <div class="field">
+          <label for="categoryId">Catégorie *</label>
+          <select id="categoryId" formControlName="categoryId">
+            <option [ngValue]="null" disabled>Choisir une catégorie</option>
+            @for (category of categories(); track category.id) {
+              <option [ngValue]="category.id">{{ category.label }}</option>
+            }
+          </select>
+          @if (errorFor('categoryId'); as message) {
+            <p class="field-error">{{ message }}</p>
+          }
+        </div>
+
+        <div class="field-row">
+          <div class="field">
+            <label for="totalCopies">Nombre d'exemplaires *</label>
+            <input id="totalCopies" type="number" min="0" formControlName="totalCopies" />
+            @if (borrowedCopies() > 0) {
+              <p class="hint">{{ borrowedCopies() }} exemplaire(s) actuellement emprunté(s).</p>
+            }
+            @if (errorFor('totalCopies'); as message) {
+              <p class="field-error">{{ message }}</p>
+            }
+          </div>
+
+          <div class="field">
+            <label for="publicationYear">Année de publication</label>
+            <input id="publicationYear" type="number" formControlName="publicationYear" />
+            @if (errorFor('publicationYear'); as message) {
+              <p class="field-error">{{ message }}</p>
+            }
+          </div>
+        </div>
+      </div>
+
+      <div class="column">
+        <div class="field">
+          <label for="description">Description</label>
+          <textarea id="description" rows="6" formControlName="description"></textarea>
+          @if (errorFor('description'); as message) {
+            <p class="field-error">{{ message }}</p>
+          }
+        </div>
+
+        <div class="field">
+          <label for="coverUrl"
+            >Couverture <span class="optional">(adresse de l'image)</span></label
+          >
+          <input
+            id="coverUrl"
+            type="url"
+            formControlName="coverUrl"
+            placeholder="https://covers.openlibrary.org/b/isbn/…"
+          />
+          @if (errorFor('coverUrl'); as message) {
+            <p class="field-error">{{ message }}</p>
+          }
+        </div>
+
+        <div class="cover-preview">
+          @if (coverPreview(); as url) {
+            <img [src]="url" alt="Aperçu de la couverture" />
+          } @else {
+            <span>Aperçu de la couverture</span>
+          }
+        </div>
+      </div>
+    </div>
+
+    <div class="actions">
+      <button type="submit" class="btn btn-primary" [disabled]="saving()">Enregistrer</button>
+      <a class="btn btn-outline" routerLink="/admin/books">Annuler</a>
+    </div>
+  </form>
+}

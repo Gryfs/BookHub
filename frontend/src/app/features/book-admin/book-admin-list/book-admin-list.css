@@ -1,0 +1,98 @@
+.alert {
+  margin-bottom: 1rem;
+}
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.search {
+  display: flex;
+  flex: 1;
+  gap: 0.5rem;
+  max-width: 480px;
+}
+
+.search input {
+  flex: 1;
+  min-width: 0;
+}
+
+.status {
+  color: var(--color-muted);
+}
+
+.table-wrapper {
+  padding: 0;
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th,
+td {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--color-border);
+  text-align: left;
+  vertical-align: middle;
+}
+
+th {
+  background: var(--color-primary-light);
+  color: var(--color-primary-dark);
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.isbn {
+  font-family: monospace;
+  white-space: nowrap;
+}
+
+.title {
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.title:hover {
+  text-decoration: underline;
+}
+
+.copies-available {
+  color: var(--color-muted);
+}
+
+.actions {
+  white-space: nowrap;
+}
+
+.btn-small {
+  padding: 0.35rem 0.75rem;
+  font-size: 0.85rem;
+}
+
+.actions .btn + .btn {
+  margin-left: 0.5rem;
+}
+
+.empty {
+  text-align: center;
+  color: var(--color-muted);
+}
+
+.hint {
+  margin-top: 1.5rem;
+  color: var(--color-muted);
+  font-size: 0.85rem;
+}

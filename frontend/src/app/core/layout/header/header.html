@@ -14,18 +14,18 @@
 
     <nav id="main-nav" aria-label="Navigation principale" [class.open]="menuOpen()">
       @if (session.isLoggedIn()) {
-        <a [routerLink]="session.homeUrl()" routerLinkActive="active" (click)="closeMenu()">{{
-          homeLabel()
-        }}</a>
+        <a
+          [routerLink]="session.homeUrl()"
+          routerLinkActive="active"
+          [routerLinkActiveOptions]="{ exact: true }"
+          (click)="closeMenu()"
+          >{{ homeLabel() }}</a
+        >
       }
-      <a
-        routerLink="/books"
-        routerLinkActive="active"
-        [routerLinkActiveOptions]="{ exact: true }"
-        (click)="closeMenu()"
-        >Catalogue</a
-      >
-      <a routerLink="/books/search" routerLinkActive="active" (click)="closeMenu()">Recherche</a>
+      <a routerLink="/books" routerLinkActive="active" (click)="closeMenu()">Catalogue</a>
+      @if (session.hasRole('LIBRARIAN')) {
+        <a routerLink="/admin/books" routerLinkActive="active" (click)="closeMenu()">Gestion</a>
+      }
       @if (session.isLoggedIn()) {
         <a routerLink="/loans" routerLinkActive="active" (click)="closeMenu()">Mes emprunts</a>
         <a routerLink="/profile" routerLinkActive="active" (click)="closeMenu()">Profil</a>

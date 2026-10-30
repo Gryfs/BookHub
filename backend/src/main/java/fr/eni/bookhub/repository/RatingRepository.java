@@ -16,6 +16,8 @@ public interface RatingRepository extends JpaRepository<Rating, Long> {
 
   long countByBookId(Long bookId);
 
+  void deleteByBookId(Long bookId);
+
   @Query("select avg(r.score) from Rating r where r.book.id = :bookId")
   Double findAverageScoreByBookId(@Param("bookId") Long bookId);
 

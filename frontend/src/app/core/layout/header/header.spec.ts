@@ -26,7 +26,7 @@ describe('Header', () => {
   }
 
   it('affiche les liens du visiteur', () => {
-    expect(navLinks()).toEqual(['Catalogue', 'Recherche']);
+    expect(navLinks()).toEqual(['Catalogue']);
     expect(element.querySelector('.account')?.textContent).toContain('Visiteur');
   });
 
@@ -40,7 +40,7 @@ describe('Header', () => {
     });
     await fixture.whenStable();
 
-    expect(navLinks()).toEqual(['Pilotage', 'Catalogue', 'Recherche', 'Profil']);
+    expect(navLinks()).toEqual(['Pilotage', 'Catalogue', 'Gestion', 'Mes emprunts', 'Profil']);
     expect(element.querySelector('.account')?.textContent).toContain('Ahmed B. · LIBRARIAN');
   });
 

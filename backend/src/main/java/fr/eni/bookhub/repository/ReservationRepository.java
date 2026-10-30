@@ -25,4 +25,6 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
   boolean existsByUserIdAndBookIdAndStatusIn(Long userId, Long bookId,
       Collection<ReservationStatus> statuses);
 
+  void deleteByBookId(Long bookId);
+
 }

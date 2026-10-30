@@ -1,0 +1,78 @@
+<h1>Gestion du catalogue</h1>
+<p class="subtitle">Ajoutez, modifiez ou supprimez les ouvrages de la bibliothèque.</p>
+
+@if (saved()) {
+  <div class="alert alert-success">Le livre a bien été enregistré.</div>
+}
+@if (deleted()) {
+  <div class="alert alert-success">Le livre a bien été supprimé du catalogue.</div>
+}
+
+<div class="toolbar">
+  <a class="btn btn-accent" routerLink="/admin/books/new">+ Ajouter un livre</a>
+  <form class="search" role="search" (submit)="onSearch(); $event.preventDefault()">
+    <input
+      type="search"
+      aria-label="Rechercher un livre"
+      placeholder="Titre, auteur ou ISBN"
+      [formControl]="search"
+    />
+    <button type="submit" class="btn btn-outline">Rechercher</button>
+  </form>
+</div>
+
+@if (errorMessage()) {
+  <div class="alert alert-error">{{ errorMessage() }}</div>
+} @else if (loading()) {
+  <p class="status">Chargement…</p>
+} @else if (books().length === 0) {
+  <div class="card empty">
+    <p>Aucun livre ne correspond à cette recherche.</p>
+    <a routerLink="/admin/books">Voir tous les livres</a>
+  </div>
+} @else {
+  <div class="table-wrapper card">
+    <table>
+      <thead>
+        <tr>
+          <th scope="col">ISBN</th>
+          <th scope="col">Titre</th>
+          <th scope="col">Auteur</th>
+          <th scope="col">Exemplaires</th>
+          <th scope="col">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (book of books(); track book.id) {
+          <tr>
+            <td class="isbn">{{ book.isbn }}</td>
+            <td>
+              <a class="title" [routerLink]="['/books', book.id]">{{ book.title }}</a>
+            </td>
+            <td>{{ book.author }}</td>
+            <td>
+              {{ book.totalCopies }}
+              <span class="copies-available">({{ book.availableCopies }} dispo)</span>
+            </td>
+            <td class="actions">
+              <a class="btn btn-outline btn-small" [routerLink]="['/admin/books', book.id, 'edit']"
+                >Modifier</a
+              >
+              @if (session.hasRole('ADMIN')) {
+                <a
+                  class="btn btn-danger btn-small"
+                  [routerLink]="['/admin/books', book.id, 'delete']"
+                  >Supprimer</a
+                >
+              }
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+
+  <app-pagination [currentPage]="currentPage()" [totalPages]="totalPages()" />
+}
+
+<p class="hint">Suppression réservée à l'administrateur, impossible si le livre a été emprunté.</p>

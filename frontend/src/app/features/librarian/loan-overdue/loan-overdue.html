@@ -1,0 +1,38 @@
+<nav class="breadcrumb">
+  <a routerLink="/librarian">Bibliothécaire</a>
+  <span aria-hidden="true">/</span>
+  <span>Retards</span>
+</nav>
+
+<h1>Emprunts en retard</h1>
+<p class="subtitle">Les lecteurs concernés ne peuvent pas emprunter de nouveaux ouvrages.</p>
+
+@if (errorMessage()) {
+  <div class="alert alert-error">{{ errorMessage() }}</div>
+} @else if (loading()) {
+  <p class="muted">Chargement…</p>
+} @else if (loans().length === 0) {
+  <div class="card empty">
+    <p>Aucun retard signalé pour le moment.</p>
+    <a routerLink="/librarian/returns" class="btn btn-outline">Voir les retours</a>
+  </div>
+} @else {
+  <ul class="late-list">
+    @for (loan of loans(); track loan.id) {
+      <li class="card">
+        <div class="head">
+          <div>
+            <p class="book">
+              <a [routerLink]="['/books', loan.bookId]">{{ loan.bookTitle }}</a>
+            </p>
+            <p class="reader">{{ readerLabel(loan) }} · {{ loan.userEmail }}</p>
+          </div>
+          <span class="badge badge-danger">{{ daysLate(loan) }} j. de retard</span>
+        </div>
+        <p class="dates">
+          Emprunté le {{ formatDate(loan.loanDate) }} — échéance {{ formatDate(loan.dueDate) }}
+        </p>
+      </li>
+    }
+  </ul>
+}

@@ -25,6 +25,9 @@
       <a routerLink="/books" routerLinkActive="active" (click)="closeMenu()">Catalogue</a>
       @if (session.hasRole('LIBRARIAN')) {
         <a routerLink="/admin/books" routerLinkActive="active" (click)="closeMenu()">Gestion</a>
+        <a routerLink="/librarian/returns" routerLinkActive="active" (click)="closeMenu()"
+          >Retours</a
+        >
       }
       @if (session.isLoggedIn()) {
         <a routerLink="/loans" routerLinkActive="active" (click)="closeMenu()">Mes emprunts</a>

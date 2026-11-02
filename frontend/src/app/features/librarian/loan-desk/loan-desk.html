@@ -1,0 +1,45 @@
+<nav class="breadcrumb">
+  <a routerLink="/librarian">Bibliothécaire</a>
+  <span aria-hidden="true">/</span>
+  <span>Comptoir</span>
+</nav>
+
+<h1>Emprunt au comptoir</h1>
+<p class="subtitle">
+  Saisissez l'e-mail du lecteur et l'identifiant du livre (visible dans l'URL de la fiche ouvrage).
+</p>
+
+@if (successMessage()) {
+  <div class="alert alert-success">{{ successMessage() }}</div>
+}
+@if (errorMessage()) {
+  <div class="alert alert-error">{{ errorMessage() }}</div>
+}
+
+<form class="card desk-form" (submit)="submit(); $event.preventDefault()" novalidate>
+  <label>
+    E-mail du lecteur
+    <input type="email" autocomplete="off" [formControl]="form.controls.userEmail" />
+    @if (form.controls.userEmail.touched && form.controls.userEmail.hasError('required')) {
+      <span class="field-error">L'e-mail est obligatoire.</span>
+    }
+    @if (form.controls.userEmail.touched && form.controls.userEmail.hasError('email')) {
+      <span class="field-error">Format d'e-mail invalide.</span>
+    }
+  </label>
+
+  <label>
+    Identifiant du livre
+    <input type="number" min="1" [formControl]="form.controls.bookId" />
+    @if (form.controls.bookId.touched && form.controls.bookId.hasError('required')) {
+      <span class="field-error">L'identifiant est obligatoire.</span>
+    }
+  </label>
+
+  <div class="actions">
+    <button type="submit" class="btn btn-primary" [disabled]="submitting()">
+      {{ submitting() ? 'Enregistrement…' : 'Valider l\'emprunt' }}
+    </button>
+    <a class="btn btn-outline" routerLink="/books">Consulter le catalogue</a>
+  </div>
+</form>

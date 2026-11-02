@@ -50,8 +50,29 @@ export const routes: Routes = [
         path: 'librarian',
         title: 'Espace bibliothécaire · BookHub',
         canActivate: [roleGuard('LIBRARIAN')],
-        data: { heading: 'Espace bibliothécaire' },
-        loadComponent: () => import('./features/dashboard/dashboard').then((m) => m.Dashboard),
+        loadComponent: () =>
+          import('./features/librarian/librarian-home/librarian-home').then((m) => m.LibrarianHome),
+      },
+      {
+        path: 'librarian/returns',
+        title: 'Retours · BookHub',
+        canActivate: [roleGuard('LIBRARIAN')],
+        loadComponent: () =>
+          import('./features/librarian/loan-returns/loan-returns').then((m) => m.LoanReturns),
+      },
+      {
+        path: 'librarian/overdue',
+        title: 'Retards · BookHub',
+        canActivate: [roleGuard('LIBRARIAN')],
+        loadComponent: () =>
+          import('./features/librarian/loan-overdue/loan-overdue').then((m) => m.LoanOverdue),
+      },
+      {
+        path: 'librarian/desk',
+        title: 'Comptoir · BookHub',
+        canActivate: [roleGuard('LIBRARIAN')],
+        loadComponent: () =>
+          import('./features/librarian/loan-desk/loan-desk').then((m) => m.LoanDesk),
       },
       {
         path: 'admin',

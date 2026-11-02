@@ -4,11 +4,13 @@ import fr.eni.bookhub.domain.Loan;
 import fr.eni.bookhub.domain.LoanStatus;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 public interface LoanRepository extends JpaRepository<Loan, Long> {
 
@@ -21,6 +23,12 @@ public interface LoanRepository extends JpaRepository<Loan, Long> {
 
   @EntityGraph(attributePaths = "book")
   List<Loan> findByUserIdOrderByLoanDateDesc(Long userId);
+
+  @EntityGraph(attributePaths = {"user", "book"})
+  List<Loan> findByStatusInOrderByLoanDateAsc(Collection<LoanStatus> statuses);
+
+  @Query("SELECT l FROM Loan l JOIN FETCH l.user JOIN FETCH l.book WHERE l.id = :id")
+  Optional<Loan> findDetailedById(@Param("id") Long id);
 
   long countByUserIdAndStatusIn(Long userId, Collection<LoanStatus> statuses);
 

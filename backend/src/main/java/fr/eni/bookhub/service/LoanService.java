@@ -4,6 +4,7 @@ import fr.eni.bookhub.domain.Book;
 import fr.eni.bookhub.domain.Loan;
 import fr.eni.bookhub.domain.LoanStatus;
 import fr.eni.bookhub.domain.User;
+import fr.eni.bookhub.dto.LibrarianLoanResponse;
 import fr.eni.bookhub.dto.LoanResponse;
 import fr.eni.bookhub.dto.MyLoansResponse;
 import fr.eni.bookhub.repository.BookRepository;
@@ -11,6 +12,9 @@ import fr.eni.bookhub.repository.LoanRepository;
 import fr.eni.bookhub.repository.UserRepository;
 import fr.eni.bookhub.service.exception.BusinessRuleException;
 import fr.eni.bookhub.service.exception.ResourceNotFoundException;
+import jakarta.persistence.EntityManager;
+import java.time.LocalDate;
+import java.util.Comparator;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -26,42 +30,53 @@ public class LoanService {
   private final LoanRepository loanRepository;
   private final BookRepository bookRepository;
   private final UserRepository userRepository;
+  private final EntityManager entityManager;
 
   @Transactional
   public LoanResponse borrow(String email, Long bookId) {
-    loanRepository.markLateLoans();
-
     User user = userRepository.findByEmailIgnoreCase(email)
         .orElseThrow(() -> new ResourceNotFoundException("Utilisateur introuvable"));
+    return openLoan(user, bookId, false);
+  }
 
-    if (loanRepository.existsByUserIdAndStatus(user.getId(), LoanStatus.LATE)) {
-      throw new BusinessRuleException(
-          "Vous avez un emprunt en retard. Rendez vos livres avant d'en emprunter un nouveau.");
+  @Transactional
+  public LoanResponse borrowAtCounter(String userEmail, Long bookId) {
+    User user = userRepository.findByEmailIgnoreCase(userEmail.trim())
+        .orElseThrow(() -> new ResourceNotFoundException("Utilisateur introuvable"));
+    return openLoan(user, bookId, true);
+  }
+
+  @Transactional(readOnly = true)
+  public List<LibrarianLoanResponse> listOutstandingLoans() {
+    syncLateStatuses();
+    return loanRepository.findByStatusInOrderByLoanDateAsc(ONGOING).stream()
+        .sorted(Comparator.comparing(Loan::getDueDate))
+        .map(LibrarianLoanResponse::from)
+        .toList();
+  }
+
+  @Transactional(readOnly = true)
+  public List<LibrarianLoanResponse> listOverdueLoans() {
+    syncLateStatuses();
+    return loanRepository.findByStatusInOrderByLoanDateAsc(List.of(LoanStatus.LATE)).stream()
+        .map(LibrarianLoanResponse::from)
+        .toList();
+  }
+
+  @Transactional
+  public LibrarianLoanResponse registerReturn(Long loanId) {
+    syncLateStatuses();
+
+    Loan loan = loanRepository.findDetailedById(loanId)
+        .orElseThrow(() -> new ResourceNotFoundException("Emprunt", loanId));
+
+    if (loan.getStatus() == LoanStatus.RETURNED) {
+      throw new BusinessRuleException("Cet emprunt est déjà clos.");
     }
 
-    long activeCount = loanRepository.countByUserIdAndStatusIn(user.getId(), ONGOING);
-    if (activeCount >= MAX_ACTIVE_LOANS) {
-      throw new BusinessRuleException("Vous avez déjà 3 emprunts en cours.");
-    }
-
-    if (loanRepository.existsByUserIdAndBookIdAndStatusIn(user.getId(), bookId, ONGOING)) {
-      throw new BusinessRuleException("Vous avez déjà emprunté ce livre.");
-    }
-
-    Book book = bookRepository.findById(bookId)
-        .orElseThrow(() -> new ResourceNotFoundException("Livre", bookId));
-
-    if (book.getAvailableCopies() <= 0) {
-      throw new BusinessRuleException(
-          "Ce livre n'est pas disponible. Vous pouvez le réserver lorsque la réservation sera ouverte.");
-    }
-
-    Loan loan = new Loan();
-    loan.setUser(user);
-    loan.setBook(book);
-    loan.setStatus(LoanStatus.ACTIVE);
-
-    return LoanResponse.from(loanRepository.save(loan));
+    loan.setReturnDate(LocalDate.now());
+    loan.setStatus(LoanStatus.RETURNED);
+    return LibrarianLoanResponse.from(loanRepository.save(loan));
   }
 
   @Transactional(readOnly = true)
@@ -81,6 +96,50 @@ public class LoanService {
         .toList();
 
     return new MyLoansResponse(current, history);
+  }
+
+  private LoanResponse openLoan(User user, Long bookId, boolean atCounter) {
+    syncLateStatuses();
+
+    if (loanRepository.existsByUserIdAndStatus(user.getId(), LoanStatus.LATE)) {
+      throw new BusinessRuleException(atCounter
+          ? "Ce lecteur a un emprunt en retard. Les exemplaires doivent être rendus avant un nouvel emprunt."
+          : "Vous avez un emprunt en retard. Rendez vos livres avant d'en emprunter un nouveau.");
+    }
+
+    long activeCount = loanRepository.countByUserIdAndStatusIn(user.getId(), ONGOING);
+    if (activeCount >= MAX_ACTIVE_LOANS) {
+      throw new BusinessRuleException(atCounter
+          ? "Ce lecteur a déjà 3 emprunts en cours."
+          : "Vous avez déjà 3 emprunts en cours.");
+    }
+
+    if (loanRepository.existsByUserIdAndBookIdAndStatusIn(user.getId(), bookId, ONGOING)) {
+      throw new BusinessRuleException(atCounter
+          ? "Ce lecteur a déjà emprunté ce livre."
+          : "Vous avez déjà emprunté ce livre.");
+    }
+
+    Book book = bookRepository.findById(bookId)
+        .orElseThrow(() -> new ResourceNotFoundException("Livre", bookId));
+
+    if (book.getAvailableCopies() <= 0) {
+      throw new BusinessRuleException(
+          "Ce livre n'est pas disponible. Vous pouvez le réserver lorsque la réservation sera ouverte.");
+    }
+
+    Loan loan = new Loan();
+    loan.setUser(user);
+    loan.setBook(book);
+    loan.setStatus(LoanStatus.ACTIVE);
+
+    return LoanResponse.from(loanRepository.save(loan));
+  }
+
+  private void syncLateStatuses() {
+    loanRepository.markLateLoans();
+    entityManager.flush();
+    entityManager.clear();
   }
 
 }

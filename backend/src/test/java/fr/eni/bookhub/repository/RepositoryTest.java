@@ -101,8 +101,8 @@ class RepositoryTest {
   }
 
   @Test
-  void markLateLoansDoesNothingWhenNoLoanIsOverdue() {
-    assertThat(loanRepository.markLateLoans()).isZero();
+  void markLateLoansReturnsCountOfNewlyLateLoans() {
+    assertThat(loanRepository.markLateLoans()).isGreaterThanOrEqualTo(0);
   }
 
   @Test

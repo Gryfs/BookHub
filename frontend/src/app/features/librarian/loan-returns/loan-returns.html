@@ -1,0 +1,74 @@
+<nav class="breadcrumb">
+  <a routerLink="/librarian">Bibliothécaire</a>
+  <span aria-hidden="true">/</span>
+  <span>Retours</span>
+</nav>
+
+<h1>Enregistrer un retour</h1>
+<p class="subtitle">Les exemplaires rendus redeviennent disponibles au catalogue.</p>
+
+@if (errorMessage()) {
+  <div class="alert alert-error">{{ errorMessage() }}</div>
+} @else if (loading()) {
+  <p class="muted">Chargement…</p>
+} @else if (loans().length === 0) {
+  <div class="card empty">
+    <p>Aucun emprunt en cours à enregistrer.</p>
+    <a routerLink="/librarian" class="btn btn-outline">Retour</a>
+  </div>
+} @else {
+  @if (rowError()) {
+    <div class="alert alert-error">{{ rowError() }}</div>
+  }
+  <div class="table-wrapper card">
+    <table>
+      <thead>
+        <tr>
+          <th scope="col">Lecteur</th>
+          <th scope="col">Ouvrage</th>
+          <th scope="col">Emprunté le</th>
+          <th scope="col">À rendre avant</th>
+          <th scope="col">Statut</th>
+          <th scope="col">Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (loan of loans(); track loan.id) {
+          <tr [class.late]="isLate(loan)">
+            <td>
+              <span class="reader">{{ readerLabel(loan) }}</span>
+              <span class="email">{{ loan.userEmail }}</span>
+            </td>
+            <td>
+              <a [routerLink]="['/books', loan.bookId]">{{ loan.bookTitle }}</a>
+              <span class="author">{{ loan.bookAuthor }}</span>
+            </td>
+            <td>{{ formatDate(loan.loanDate) }}</td>
+            <td>{{ formatDate(loan.dueDate) }}</td>
+            <td>
+              @if (isLate(loan)) {
+                <span class="badge badge-danger">En retard</span>
+              } @else {
+                <span class="badge badge-success">En cours</span>
+              }
+            </td>
+            <td>
+              @if (rowMessage() === loan.id) {
+                <span class="ok">Retour enregistré</span>
+              } @else {
+                <button
+                  type="button"
+                  class="btn btn-primary btn-small"
+                  [disabled]="busyId() === loan.id"
+                  (click)="returnLoan(loan)"
+                >
+                  {{ busyId() === loan.id ? '…' : 'Retour reçu' }}
+                </button>
+              }
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+}

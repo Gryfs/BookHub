@@ -1,0 +1,38 @@
+.breadcrumb {
+  margin-bottom: 1rem;
+  color: var(--color-muted);
+}
+
+.late-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 1rem;
+}
+
+.head {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: flex-start;
+}
+
+.book {
+  margin: 0;
+  font-weight: 600;
+}
+
+.reader,
+.dates {
+  margin: 0.35rem 0 0;
+  color: var(--color-muted);
+}
+
+.empty {
+  text-align: center;
+}
+
+.muted {
+  color: var(--color-muted);
+}

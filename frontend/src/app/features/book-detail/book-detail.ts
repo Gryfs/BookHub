@@ -4,6 +4,7 @@ import { RouterLink } from '@angular/router';
 
 import { BookApi } from '../../core/api/book-api';
 import { LoanApi } from '../../core/api/loan-api';
+import { ReservationApi } from '../../core/api/reservation-api';
 import { Session } from '../../core/auth/session';
 import { BookDetail } from '../../shared/models/book';
 import { ProblemDetail } from '../../shared/models/problem-detail';
@@ -17,6 +18,7 @@ import { ProblemDetail } from '../../shared/models/problem-detail';
 export class BookDetailPage {
   private readonly bookApi = inject(BookApi);
   private readonly loanApi = inject(LoanApi);
+  private readonly reservationApi = inject(ReservationApi);
   protected readonly session = inject(Session);
 
   readonly id = input.required<string>();
@@ -27,6 +29,7 @@ export class BookDetailPage {
   protected readonly actionMessage = signal('');
   protected readonly actionError = signal('');
   protected readonly borrowing = signal(false);
+  protected readonly reserving = signal(false);
   protected readonly loanDueDate = signal<string | null>(null);
 
   protected readonly bookId = computed(() => Number(this.id()));
@@ -104,6 +107,33 @@ export class BookDetailPage {
   private reloadBook(id: number): void {
     this.bookApi.getBook(id).subscribe({
       next: (b) => this.book.set(b),
+    });
+  }
+
+  reserve(): void {
+    const book = this.book();
+    if (!book || this.reserving()) {
+      return;
+    }
+    if (!confirm(`Rejoindre la file d'attente pour « ${book.title} » ?`)) {
+      return;
+    }
+    this.reserving.set(true);
+    this.actionError.set('');
+    this.actionMessage.set('');
+    this.reservationApi.reserve(book.id).subscribe({
+      next: (reservation) => {
+        this.reserving.set(false);
+        const position = reservation.queuePosition
+          ? ` (position ${reservation.queuePosition})`
+          : '';
+        this.actionMessage.set(`Réservation enregistrée${position}.`);
+      },
+      error: (error: HttpErrorResponse) => {
+        this.reserving.set(false);
+        const detail = (error.error as ProblemDetail | null)?.detail;
+        this.actionError.set(detail ?? 'Impossible de réserver ce livre.');
+      },
     });
   }
 }

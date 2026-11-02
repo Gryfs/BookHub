@@ -1,0 +1,50 @@
+<h1>Mes réservations</h1>
+<p class="subtitle">File d'attente et exemplaires prêts à retirer (48 h).</p>
+
+@if (errorMessage()) {
+  <div class="alert alert-error">{{ errorMessage() }}</div>
+} @else if (loading()) {
+  <p class="muted">Chargement…</p>
+} @else if (items().length === 0) {
+  <div class="card empty">
+    <p>Aucune réservation en cours.</p>
+    <a routerLink="/books" class="btn btn-primary">Parcourir le catalogue</a>
+  </div>
+} @else {
+  @if (rowError()) {
+    <div class="alert alert-error">{{ rowError() }}</div>
+  }
+  <ul class="list">
+    @for (item of items(); track item.id) {
+      <li class="card" [class.ready]="item.status === 'AVAILABLE'">
+        <div class="head">
+          <div>
+            <a [routerLink]="['/books', item.bookId]" class="title">{{ item.bookTitle }}</a>
+            <p class="author">{{ item.bookAuthor }}</p>
+          </div>
+          <span class="badge" [class.badge-success]="item.status === 'AVAILABLE'">{{
+            statusLabel(item)
+          }}</span>
+        </div>
+        @if (item.pickupDeadline) {
+          <p class="deadline">À retirer avant le {{ formatDateTime(item.pickupDeadline) }}</p>
+        }
+        <div class="actions">
+          @if (item.status === 'AVAILABLE') {
+            <a class="btn btn-primary btn-small" [routerLink]="['/books', item.bookId]"
+              >Emprunter maintenant</a
+            >
+          }
+          <button
+            type="button"
+            class="btn btn-outline btn-small"
+            [disabled]="busyId() === item.id"
+            (click)="cancel(item)"
+          >
+            Annuler
+          </button>
+        </div>
+      </li>
+    }
+  </ul>
+}

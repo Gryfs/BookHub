@@ -1,0 +1,37 @@
+<nav class="breadcrumb">
+  <a routerLink="/librarian">Bibliothécaire</a>
+  <span aria-hidden="true">/</span>
+  <span>Retraits réservés</span>
+</nav>
+
+<h1>Retraits sous 48 h</h1>
+<p class="subtitle">Lecteurs en tête de file lorsqu'un exemplaire redevient disponible.</p>
+
+<button type="button" class="btn btn-outline maintenance" (click)="expireStale()">
+  Traiter les retraits expirés
+</button>
+@if (maintenanceMessage()) {
+  <div class="alert alert-success">{{ maintenanceMessage() }}</div>
+}
+
+@if (errorMessage()) {
+  <div class="alert alert-error">{{ errorMessage() }}</div>
+} @else if (loading()) {
+  <p class="muted">Chargement…</p>
+} @else if (ready().length === 0) {
+  <div class="card empty">
+    <p>Aucun exemplaire en attente de retrait pour le moment.</p>
+  </div>
+} @else {
+  <ul class="list">
+    @for (item of ready(); track item.id) {
+      <li class="card">
+        <p class="title">
+          <a [routerLink]="['/books', item.bookId]">{{ item.bookTitle }}</a>
+        </p>
+        <p class="meta">Réservation du {{ formatDateTime(item.reservationDate) }}</p>
+        <p class="deadline">Retrait avant le {{ formatDateTime(item.pickupDeadline) }}</p>
+      </li>
+    }
+  </ul>
+}

@@ -5,7 +5,9 @@ import fr.eni.bookhub.dto.CreateCounterLoanRequest;
 import fr.eni.bookhub.dto.ErrorResponse;
 import fr.eni.bookhub.dto.LibrarianLoanResponse;
 import fr.eni.bookhub.dto.LoanResponse;
+import fr.eni.bookhub.dto.ReservationResponse;
 import fr.eni.bookhub.service.LoanService;
+import fr.eni.bookhub.service.ReservationService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -34,6 +36,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class LibrarianController {
 
   private final LoanService loanService;
+  private final ReservationService reservationService;
 
   @GetMapping("/access-check")
   @Operation(summary = "Vérifier l'accès bibliothécaire")
@@ -77,6 +80,20 @@ public class LibrarianController {
       content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
   public LoanResponse counterLoan(@Valid @RequestBody CreateCounterLoanRequest request) {
     return loanService.borrowAtCounter(request.userEmail(), request.bookId());
+  }
+
+  @GetMapping("/reservations/ready")
+  @Operation(summary = "Exemplaires prêts à retirer (US-RESA-03)",
+      description = "Réservations AVAILABLE avec délai de 48 h encore valide.")
+  public List<ReservationResponse> readyReservations() {
+    return reservationService.listReadyForPickup();
+  }
+
+  @PostMapping("/reservations/expire")
+  @Operation(summary = "Expirer les retraits dépassés (US-RESA-03)",
+      description = "Annule les AVAILABLE hors délai et passe au suivant dans la file.")
+  public int expireReservations() {
+    return reservationService.expireStaleReservations();
   }
 
 }

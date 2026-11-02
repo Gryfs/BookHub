@@ -31,6 +31,7 @@ public class LoanService {
   private final BookRepository bookRepository;
   private final UserRepository userRepository;
   private final EntityManager entityManager;
+  private final ReservationService reservationService;
 
   @Transactional
   public LoanResponse borrow(String email, Long bookId) {
@@ -76,7 +77,10 @@ public class LoanService {
 
     loan.setReturnDate(LocalDate.now());
     loan.setStatus(LoanStatus.RETURNED);
-    return LibrarianLoanResponse.from(loanRepository.save(loan));
+    Long bookId = loan.getBook().getId();
+    Loan saved = loanRepository.save(loan);
+    reservationService.onCopyAvailable(bookId);
+    return LibrarianLoanResponse.from(saved);
   }
 
   @Transactional(readOnly = true)
@@ -128,12 +132,16 @@ public class LoanService {
           "Ce livre n'est pas disponible. Vous pouvez le réserver lorsque la réservation sera ouverte.");
     }
 
+    reservationService.assertBorrowAllowed(user, book);
+
     Loan loan = new Loan();
     loan.setUser(user);
     loan.setBook(book);
     loan.setStatus(LoanStatus.ACTIVE);
 
-    return LoanResponse.from(loanRepository.save(loan));
+    Loan saved = loanRepository.save(loan);
+    reservationService.closeAvailableReservationOnBorrow(user, bookId);
+    return LoanResponse.from(saved);
   }
 
   private void syncLateStatuses() {

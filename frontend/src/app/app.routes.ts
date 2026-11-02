@@ -28,6 +28,13 @@ export const routes: Routes = [
         loadComponent: () => import('./features/my-loans/my-loans').then((m) => m.MyLoans),
       },
       {
+        path: 'reservations',
+        title: 'Mes réservations · BookHub',
+        canActivate: [authGuard],
+        loadComponent: () =>
+          import('./features/my-reservations/my-reservations').then((m) => m.MyReservations),
+      },
+      {
         path: 'login',
         title: 'Connexion · BookHub',
         canActivate: [guestGuard],
@@ -73,6 +80,15 @@ export const routes: Routes = [
         canActivate: [roleGuard('LIBRARIAN')],
         loadComponent: () =>
           import('./features/librarian/loan-desk/loan-desk').then((m) => m.LoanDesk),
+      },
+      {
+        path: 'librarian/reservations',
+        title: 'Retraits réservés · BookHub',
+        canActivate: [roleGuard('LIBRARIAN')],
+        loadComponent: () =>
+          import('./features/librarian/librarian-reservations/librarian-reservations').then(
+            (m) => m.LibrarianReservations,
+          ),
       },
       {
         path: 'admin',

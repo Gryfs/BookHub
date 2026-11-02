@@ -50,8 +50,16 @@
                 {{ borrowing() ? 'Emprunt…' : 'Emprunter' }}
               </button>
             } @else {
+              <button
+                type="button"
+                class="btn btn-primary"
+                [disabled]="reserving()"
+                (click)="reserve()"
+              >
+                {{ reserving() ? 'Réservation…' : 'Réserver' }}
+              </button>
               <p class="reserve-hint">
-                Indisponible — la <strong>réservation</strong> (file d'attente) arrive au Sprint 2 (US-RESA-01).
+                Vous serez prévenu par la file d'attente (48 h pour retirer l'exemplaire).
               </p>
             }
           } @else if (book.available) {

@@ -31,6 +31,9 @@
       }
       @if (session.isLoggedIn()) {
         <a routerLink="/loans" routerLinkActive="active" (click)="closeMenu()">Mes emprunts</a>
+        <a routerLink="/reservations" routerLinkActive="active" (click)="closeMenu()"
+          >Réservations</a
+        >
         <a routerLink="/profile" routerLinkActive="active" (click)="closeMenu()">Profil</a>
       }
     </nav>

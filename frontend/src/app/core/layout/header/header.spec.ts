@@ -40,7 +40,15 @@ describe('Header', () => {
     });
     await fixture.whenStable();
 
-    expect(navLinks()).toEqual(['Pilotage', 'Catalogue', 'Gestion', 'Retours', 'Mes emprunts', 'Profil']);
+    expect(navLinks()).toEqual([
+      'Pilotage',
+      'Catalogue',
+      'Gestion',
+      'Retours',
+      'Mes emprunts',
+      'Réservations',
+      'Profil',
+    ]);
     expect(element.querySelector('.account')?.textContent).toContain('Ahmed B. · LIBRARIAN');
   });
 

@@ -35,6 +35,9 @@ public class Reservation {
   @Column(name = "statut", nullable = false)
   private ReservationStatus status = ReservationStatus.WAITING;
 
+  @Column(name = "date_limite_retrait")
+  private OffsetDateTime pickupDeadline;
+
   @ManyToOne(fetch = FetchType.LAZY, optional = false)
   @JoinColumn(name = "id_utilisateur", nullable = false)
   private User user;

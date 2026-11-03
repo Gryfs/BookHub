@@ -90,6 +90,44 @@
 
     <section class="reviews">
       <h2>Avis des lecteurs</h2>
+
+      @if (session.isLoggedIn()) {
+        @if (ratingContext(); as ctx) {
+          @if (ctx.canRate) {
+            <form class="review-form card" (submit)="$event.preventDefault(); publishReview()">
+              <h3>{{ ctx.myReview ? 'Modifier votre avis' : 'Donner votre avis' }}</h3>
+              @if (reviewMessage()) {
+                <div class="alert alert-success">{{ reviewMessage() }}</div>
+              }
+              @if (reviewError()) {
+                <div class="alert alert-error">{{ reviewError() }}</div>
+              }
+              <label for="score">Note</label>
+              <select id="score" name="score" [ngModel]="draftScore()" (ngModelChange)="draftScore.set($event)">
+                @for (n of [1, 2, 3, 4, 5]; track n) {
+                  <option [ngValue]="n">{{ n }} / 5</option>
+                }
+              </select>
+              <label for="comment">Commentaire (facultatif)</label>
+              <textarea
+                id="comment"
+                name="comment"
+                rows="4"
+                maxlength="1000"
+                [ngModel]="draftComment()"
+                (ngModelChange)="draftComment.set($event)"
+                placeholder="Ce que vous avez retenu de la lecture…"
+              ></textarea>
+              <button type="submit" class="btn btn-primary" [disabled]="savingReview()">
+                {{ savingReview() ? 'Enregistrement…' : 'Publier' }}
+              </button>
+            </form>
+          } @else if (ctx.reason) {
+            <p class="muted review-hint">{{ ctx.reason }}</p>
+          }
+        }
+      }
+
       @if (book.reviews.length === 0) {
         <p class="muted">Aucun avis pour le moment.</p>
       } @else {

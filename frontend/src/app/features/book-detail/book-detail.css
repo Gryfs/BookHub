@@ -91,6 +91,29 @@
   margin-top: 2rem;
 }
 
+.review-form {
+  margin-bottom: 1.5rem;
+  padding: 1.25rem;
+  display: grid;
+  gap: 0.65rem;
+}
+
+.review-form h3 {
+  margin: 0 0 0.25rem;
+  font-size: 1.05rem;
+}
+
+.review-form select,
+.review-form textarea {
+  width: 100%;
+  max-width: 32rem;
+  font: inherit;
+}
+
+.review-hint {
+  margin-bottom: 1rem;
+}
+
 .reviews ul {
   list-style: none;
   margin: 0;

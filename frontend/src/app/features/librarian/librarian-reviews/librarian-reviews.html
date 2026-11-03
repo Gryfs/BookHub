@@ -1,0 +1,42 @@
+<nav class="breadcrumb">
+  <a routerLink="/librarian">Espace bibliothécaire</a>
+  <span aria-hidden="true">/</span>
+  <span>Modération des avis</span>
+</nav>
+
+<h1>Modération des avis</h1>
+<p class="subtitle">Retirez les commentaires inappropriés. La suppression est définitive.</p>
+
+@if (feedback()) {
+  <div class="alert alert-success">{{ feedback() }}</div>
+}
+@if (errorMessage()) {
+  <div class="alert alert-error">{{ errorMessage() }}</div>
+}
+
+@if (loading()) {
+  <p class="muted">Chargement…</p>
+} @else if (reviews().length === 0) {
+  <p class="muted">Aucun avis à afficher.</p>
+} @else {
+  <ul class="review-list">
+    @for (review of reviews(); track review.id) {
+      <li class="card">
+        <header>
+          <div>
+            <a [routerLink]="['/books', review.bookId]">{{ review.bookTitle }}</a>
+            <p class="meta">{{ review.authorLabel }} · {{ review.score }} / 5</p>
+          </div>
+          <button type="button" class="btn btn-outline btn-danger" (click)="remove(review)">
+            Retirer
+          </button>
+        </header>
+        @if (review.comment) {
+          <p class="body">{{ review.comment }}</p>
+        } @else {
+          <p class="muted body">Pas de commentaire texte.</p>
+        }
+      </li>
+    }
+  </ul>
+}

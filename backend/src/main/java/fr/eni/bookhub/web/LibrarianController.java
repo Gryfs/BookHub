@@ -4,9 +4,11 @@ import fr.eni.bookhub.config.OpenApiConfig;
 import fr.eni.bookhub.dto.CreateCounterLoanRequest;
 import fr.eni.bookhub.dto.ErrorResponse;
 import fr.eni.bookhub.dto.LibrarianLoanResponse;
+import fr.eni.bookhub.dto.LibrarianReviewResponse;
 import fr.eni.bookhub.dto.LoanResponse;
 import fr.eni.bookhub.dto.ReservationResponse;
 import fr.eni.bookhub.service.LoanService;
+import fr.eni.bookhub.service.RatingService;
 import fr.eni.bookhub.service.ReservationService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -19,11 +21,13 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -37,6 +41,7 @@ public class LibrarianController {
 
   private final LoanService loanService;
   private final ReservationService reservationService;
+  private final RatingService ratingService;
 
   @GetMapping("/access-check")
   @Operation(summary = "Vérifier l'accès bibliothécaire")
@@ -94,6 +99,22 @@ public class LibrarianController {
       description = "Annule les AVAILABLE hors délai et passe au suivant dans la file.")
   public int expireReservations() {
     return reservationService.expireStaleReservations();
+  }
+
+  @GetMapping("/reviews")
+  @Operation(summary = "Avis récents (US-RATE-03)",
+      description = "Liste les avis les plus récents pour repérer les contenus à modérer.")
+  public List<LibrarianReviewResponse> recentReviews(
+      @RequestParam(defaultValue = "40") int limit) {
+    return ratingService.listRecentForModeration(limit);
+  }
+
+  @DeleteMapping("/reviews/{id}")
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  @Operation(summary = "Retirer un avis (US-RATE-03)",
+      description = "Supprime définitivement l'avis signalé ou inapproprié.")
+  public void deleteReview(@PathVariable Long id) {
+    ratingService.removeByLibrarian(id);
   }
 
 }

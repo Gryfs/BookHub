@@ -1,9 +1,11 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component, computed, effect, inject, input, signal } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 
 import { BookApi } from '../../core/api/book-api';
 import { LoanApi } from '../../core/api/loan-api';
+import { RatingApi, ReaderRatingContext } from '../../core/api/rating-api';
 import { ReservationApi } from '../../core/api/reservation-api';
 import { Session } from '../../core/auth/session';
 import { BookDetail } from '../../shared/models/book';
@@ -11,7 +13,7 @@ import { ProblemDetail } from '../../shared/models/problem-detail';
 
 @Component({
   selector: 'app-book-detail',
-  imports: [RouterLink],
+  imports: [RouterLink, FormsModule],
   templateUrl: './book-detail.html',
   styleUrl: './book-detail.css',
 })
@@ -19,6 +21,7 @@ export class BookDetailPage {
   private readonly bookApi = inject(BookApi);
   private readonly loanApi = inject(LoanApi);
   private readonly reservationApi = inject(ReservationApi);
+  private readonly ratingApi = inject(RatingApi);
   protected readonly session = inject(Session);
 
   readonly id = input.required<string>();
@@ -31,6 +34,12 @@ export class BookDetailPage {
   protected readonly borrowing = signal(false);
   protected readonly reserving = signal(false);
   protected readonly loanDueDate = signal<string | null>(null);
+  protected readonly ratingContext = signal<ReaderRatingContext | null>(null);
+  protected readonly draftScore = signal(4);
+  protected readonly draftComment = signal('');
+  protected readonly savingReview = signal(false);
+  protected readonly reviewMessage = signal('');
+  protected readonly reviewError = signal('');
 
   protected readonly bookId = computed(() => Number(this.id()));
 
@@ -54,6 +63,7 @@ export class BookDetailPage {
         next: (book) => {
           this.book.set(book);
           this.loading.set(false);
+          this.loadRatingContext(id);
         },
         error: () => {
           this.book.set(null);
@@ -62,6 +72,35 @@ export class BookDetailPage {
         },
       });
     });
+  }
+
+  protected publishReview(): void {
+    const book = this.book();
+    if (!book || this.savingReview() || !this.ratingContext()?.canRate) {
+      return;
+    }
+    this.savingReview.set(true);
+    this.reviewMessage.set('');
+    this.reviewError.set('');
+    this.ratingApi
+      .save({
+        bookId: book.id,
+        score: this.draftScore(),
+        comment: this.draftComment().trim() || null,
+      })
+      .subscribe({
+        next: () => {
+          this.savingReview.set(false);
+          this.reviewMessage.set('Votre avis a été enregistré.');
+          this.reloadBook(book.id);
+          this.loadRatingContext(book.id);
+        },
+        error: (error: HttpErrorResponse) => {
+          this.savingReview.set(false);
+          const detail = (error.error as ProblemDetail | null)?.detail;
+          this.reviewError.set(detail ?? 'Enregistrement impossible.');
+        },
+      });
   }
 
   ratingLabel(): string {
@@ -107,6 +146,26 @@ export class BookDetailPage {
   private reloadBook(id: number): void {
     this.bookApi.getBook(id).subscribe({
       next: (b) => this.book.set(b),
+    });
+  }
+
+  private loadRatingContext(bookId: number): void {
+    if (!this.session.isLoggedIn()) {
+      this.ratingContext.set(null);
+      return;
+    }
+    this.ratingApi.getContext(bookId).subscribe({
+      next: (ctx) => {
+        this.ratingContext.set(ctx);
+        if (ctx.myReview) {
+          this.draftScore.set(ctx.myReview.score);
+          this.draftComment.set(ctx.myReview.comment ?? '');
+        } else {
+          this.draftScore.set(4);
+          this.draftComment.set('');
+        }
+      },
+      error: () => this.ratingContext.set(null),
     });
   }
 

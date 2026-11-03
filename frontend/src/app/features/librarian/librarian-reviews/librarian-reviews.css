@@ -1,0 +1,43 @@
+.subtitle {
+  color: var(--color-muted);
+  margin-top: -0.5rem;
+}
+
+.review-list {
+  list-style: none;
+  margin: 1.5rem 0 0;
+  padding: 0;
+  display: grid;
+  gap: 1rem;
+}
+
+.review-list li {
+  padding: 1rem 1.25rem;
+}
+
+.review-list header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.review-list header a {
+  font-weight: 600;
+  color: var(--color-primary);
+}
+
+.meta {
+  margin: 0.25rem 0 0;
+  color: var(--color-muted);
+  font-size: 0.95rem;
+}
+
+.body {
+  margin: 0.75rem 0 0;
+}
+
+.btn-danger {
+  border-color: var(--color-danger, #b42318);
+  color: var(--color-danger, #b42318);
+}

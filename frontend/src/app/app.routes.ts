@@ -91,6 +91,15 @@ export const routes: Routes = [
           ),
       },
       {
+        path: 'librarian/reviews',
+        title: 'Modération des avis · BookHub',
+        canActivate: [roleGuard('LIBRARIAN')],
+        loadComponent: () =>
+          import('./features/librarian/librarian-reviews/librarian-reviews').then(
+            (m) => m.LibrarianReviews,
+          ),
+      },
+      {
         path: 'admin',
         title: 'Administration · BookHub',
         canActivate: [roleGuard('ADMIN')],

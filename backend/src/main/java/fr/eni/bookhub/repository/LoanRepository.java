@@ -40,6 +40,8 @@ public interface LoanRepository extends JpaRepository<Loan, Long> {
 
   boolean existsByUserIdAndBookIdAndStatusIn(Long userId, Long bookId, Collection<LoanStatus> statuses);
 
+  boolean existsByUserIdAndBookIdAndStatus(Long userId, Long bookId, LoanStatus status);
+
   long countByBookIdAndStatusIn(Long bookId, Collection<LoanStatus> statuses);
 
   boolean existsByBookId(Long bookId);

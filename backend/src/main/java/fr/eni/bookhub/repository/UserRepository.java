@@ -1,5 +1,6 @@
 package fr.eni.bookhub.repository;
 
+import fr.eni.bookhub.domain.Role;
 import fr.eni.bookhub.domain.User;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -11,6 +12,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
   Optional<User> findByEmailIgnoreCase(String email);
 
   boolean existsByEmailIgnoreCase(String email);
+
+  long countByRole(Role role);
 
   @Query(value = "SELECT 1 FROM fn_anonymiser_utilisateur(:userId)", nativeQuery = true)
   int anonymize(@Param("userId") Long userId);

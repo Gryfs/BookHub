@@ -103,8 +103,8 @@ export const routes: Routes = [
         path: 'admin',
         title: 'Administration · BookHub',
         canActivate: [roleGuard('ADMIN')],
-        data: { heading: 'Administration' },
-        loadComponent: () => import('./features/dashboard/dashboard').then((m) => m.Dashboard),
+        loadComponent: () =>
+          import('./features/admin-dashboard/admin-dashboard').then((m) => m.AdminDashboardPage),
       },
       {
         path: 'admin/books',

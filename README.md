@@ -40,3 +40,21 @@ Mot de passe de tous les comptes : `BookHub!2026a`
 2. Appeler `POST /api/auth/login` avec un compte de test et copier le `token` de la réponse.
 3. Cliquer sur **Authorize**, coller le jeton puis valider.
 4. Les routes protégées (cadenas) sont alors utilisables.
+
+## Tableaux de bord (US-DASH)
+
+| Rôle | Page | API principale |
+| --- | --- | --- |
+| USER | http://localhost:4200/dashboard | `GET /api/dashboard/reader` |
+| LIBRARIAN | http://localhost:4200/librarian | `GET /api/librarian/dashboard` |
+| ADMIN | http://localhost:4200/admin | `GET /api/admin/dashboard`, `GET /api/admin/users`, `PUT /api/admin/users/{id}/role` |
+
+Les indicateurs biblio s'appuient sur les fonctions SQL `fn_stats_bibliotheque` et `fn_top_livres`. Le graphique mensuel (`fn_emprunts_par_mois`) n'est pas exposé en v1.
+
+## Tests
+
+Dans `backend` : `./gradlew test`
+
+Dans `frontend` : `npm test -- --watch=false`
+
+Le script SQL de référence (Neon) est dans `docs/BookHub – Script SQL Neon (PostgreSQL).sql`.

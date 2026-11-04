@@ -1,6 +1,71 @@
 <h1>Bonjour {{ session.user()?.firstName }}</h1>
-<p class="subtitle">{{ heading() }}</p>
+<p class="subtitle">Votre espace lecteur</p>
 
-<div class="card">
-  <p>Votre tableau de bord sera bientôt disponible.</p>
-</div>
+@if (errorMessage()) {
+  <div class="alert alert-error">{{ errorMessage() }}</div>
+} @else if (loading()) {
+  <p class="muted">Chargement…</p>
+} @else if (data(); as dash) {
+  @if (dash.hasLateLoan) {
+    <div class="alert alert-error">
+      Vous avez au moins un emprunt en retard.
+      <a routerLink="/loans">Voir mes emprunts</a>
+    </div>
+  }
+
+  <section class="grid">
+    <div class="card">
+      <h2>Emprunts en cours</h2>
+      @if (dash.currentLoans.length === 0) {
+        <p class="muted">Aucun livre emprunté pour le moment.</p>
+        <a routerLink="/books" class="btn btn-primary">Catalogue</a>
+      } @else {
+        <ul class="compact-list">
+          @for (loan of dash.currentLoans; track loan.id) {
+            <li [class.late]="isLate(loan)">
+              <a [routerLink]="['/books', loan.bookId]">{{ loan.bookTitle }}</a>
+              <span class="muted"> · à rendre le {{ formatDate(loan.dueDate) }}</span>
+              @if (isLate(loan)) {
+                <span class="badge badge-danger">Retard</span>
+              }
+            </li>
+          }
+        </ul>
+        <p class="foot"><a routerLink="/loans">Tous mes emprunts</a></p>
+      }
+    </div>
+
+    <div class="card">
+      <h2>Mes réservations</h2>
+      @if (dash.reservations.length === 0) {
+        <p class="muted">Aucune réservation active.</p>
+      } @else {
+        <ul class="compact-list">
+          @for (res of dash.reservations; track res.id) {
+            <li>
+              <a [routerLink]="['/books', res.bookId]">{{ res.bookTitle }}</a>
+              <span class="badge">{{ reservationLabel(res) }}</span>
+            </li>
+          }
+        </ul>
+        <p class="foot"><a routerLink="/reservations">Mes réservations</a></p>
+      }
+    </div>
+
+    <div class="card span-all">
+      <h2>Lus récemment</h2>
+      @if (dash.recentlyReturned.length === 0) {
+        <p class="muted">Votre historique apparaîtra ici après vos retours.</p>
+      } @else {
+        <ul class="compact-list">
+          @for (loan of dash.recentlyReturned; track loan.id) {
+            <li>
+              <a [routerLink]="['/books', loan.bookId]">{{ loan.bookTitle }}</a>
+              <span class="muted"> · rendu le {{ formatDate(loan.returnDate!) }}</span>
+            </li>
+          }
+        </ul>
+      }
+    </div>
+  </section>
+}

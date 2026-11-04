@@ -1,6 +1,47 @@
 <h1>Espace bibliothécaire</h1>
 <p class="subtitle">Retours, suivi des retards et prêts au comptoir.</p>
 
+@if (statsLoading()) {
+  <p class="muted">Chargement des indicateurs…</p>
+} @else if (dashboard(); as dash) {
+  <section class="kpi-row">
+    <div class="kpi card">
+      <span class="kpi-value">{{ dash.stats.bookCount }}</span>
+      <span class="kpi-label">Titres</span>
+    </div>
+    <div class="kpi card">
+      <span class="kpi-value">{{ dash.stats.activeLoans }}</span>
+      <span class="kpi-label">Emprunts actifs</span>
+    </div>
+    <div class="kpi card warn">
+      <span class="kpi-value">{{ dash.stats.lateLoans }}</span>
+      <span class="kpi-label">En retard</span>
+    </div>
+    <div class="kpi card">
+      <span class="kpi-value">{{ dash.stats.waitingReservations }}</span>
+      <span class="kpi-label">Résa en attente</span>
+    </div>
+  </section>
+  @if (dash.stats.lateLoans > 0) {
+    <p class="late-hint">
+      <a routerLink="/librarian/overdue">Consulter les retards</a>
+    </p>
+  }
+  @if (dash.topBooks.length > 0) {
+    <div class="card top-card">
+      <h2>Les plus empruntés (12 mois)</h2>
+      <ol>
+        @for (book of dash.topBooks.slice(0, 5); track book.bookId) {
+          <li>
+            <a [routerLink]="['/books', book.bookId]">{{ book.title }}</a>
+            <span class="muted"> ({{ book.loanCount }})</span>
+          </li>
+        }
+      </ol>
+    </div>
+  }
+}
+
 <ul class="hub">
   <li class="card">
     <h2>Retours</h2>

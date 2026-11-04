@@ -3,10 +3,12 @@ package fr.eni.bookhub.web;
 import fr.eni.bookhub.config.OpenApiConfig;
 import fr.eni.bookhub.dto.CreateCounterLoanRequest;
 import fr.eni.bookhub.dto.ErrorResponse;
+import fr.eni.bookhub.dto.LibrarianDashboardResponse;
 import fr.eni.bookhub.dto.LibrarianLoanResponse;
 import fr.eni.bookhub.dto.LibrarianReviewResponse;
 import fr.eni.bookhub.dto.LoanResponse;
 import fr.eni.bookhub.dto.ReservationResponse;
+import fr.eni.bookhub.service.DashboardService;
 import fr.eni.bookhub.service.LoanService;
 import fr.eni.bookhub.service.RatingService;
 import fr.eni.bookhub.service.ReservationService;
@@ -42,11 +44,18 @@ public class LibrarianController {
   private final LoanService loanService;
   private final ReservationService reservationService;
   private final RatingService ratingService;
+  private final DashboardService dashboardService;
 
   @GetMapping("/access-check")
   @Operation(summary = "Vérifier l'accès bibliothécaire")
   public String accessCheck() {
     return "ok";
+  }
+
+  @GetMapping("/dashboard")
+  @Operation(summary = "Indicateurs bibliothèque (US-DASH-02)")
+  public LibrarianDashboardResponse dashboard() {
+    return dashboardService.librarianDashboard();
   }
 
   @GetMapping("/loans/outstanding")

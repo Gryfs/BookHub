@@ -1,0 +1,93 @@
+<h1>Administration</h1>
+<p class="subtitle">Bonjour {{ session.user()?.firstName }} — pilotage de la bibliothèque</p>
+
+@if (errorMessage()) {
+  <div class="alert alert-error">{{ errorMessage() }}</div>
+} @else if (loading()) {
+  <p class="muted">Chargement…</p>
+} @else if (dashboard(); as dash) {
+  <section class="kpi-row">
+    <div class="kpi card">
+      <span class="kpi-value">{{ dash.stats.bookCount }}</span>
+      <span class="kpi-label">Titres</span>
+    </div>
+    <div class="kpi card">
+      <span class="kpi-value">{{ dash.stats.copyCount }}</span>
+      <span class="kpi-label">Exemplaires</span>
+    </div>
+    <div class="kpi card">
+      <span class="kpi-value">{{ dash.stats.activeLoans }}</span>
+      <span class="kpi-label">Emprunts actifs</span>
+    </div>
+    <div class="kpi card warn">
+      <span class="kpi-value">{{ dash.stats.lateLoans }}</span>
+      <span class="kpi-label">En retard</span>
+    </div>
+    <div class="kpi card">
+      <span class="kpi-value">{{ dash.userCount }}</span>
+      <span class="kpi-label">Comptes actifs</span>
+    </div>
+  </section>
+
+  @if (dash.stats.lateLoans > 0) {
+    <p class="hint">
+      <a routerLink="/librarian/overdue">Voir les retards</a> (accès bibliothécaire requis).
+    </p>
+  }
+
+  <div class="card">
+    <h2>Top emprunts (12 mois)</h2>
+    @if (dash.topBooks.length === 0) {
+      <p class="muted">Pas encore de statistiques.</p>
+    } @else {
+      <ol class="top-list">
+        @for (book of dash.topBooks; track book.bookId) {
+          <li>
+            <a [routerLink]="['/books', book.bookId]">{{ book.title }}</a>
+            <span class="muted"> — {{ book.loanCount }} emprunt(s)</span>
+          </li>
+        }
+      </ol>
+    }
+  </div>
+}
+
+<section class="card users-section">
+  <h2>Utilisateurs et rôles</h2>
+  @if (roleError()) {
+    <div class="alert alert-error">{{ roleError() }}</div>
+  }
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Nom</th>
+          <th>E-mail</th>
+          <th>Rôle</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (user of users(); track user.id) {
+          <tr>
+            <td>{{ user.firstName }} {{ user.lastName }}</td>
+            <td>{{ user.email }}</td>
+            <td>
+              <select
+                [value]="user.role"
+                (change)="onRoleChange(user, $any($event.target).value)"
+              >
+                @for (role of roles; track role) {
+                  <option [value]="role">{{ role }}</option>
+                }
+              </select>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<p class="foot">
+  <a routerLink="/admin/books">Gestion du catalogue</a>
+</p>

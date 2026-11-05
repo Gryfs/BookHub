@@ -40,8 +40,15 @@ export class BookDetailPage {
   protected readonly savingReview = signal(false);
   protected readonly reviewMessage = signal('');
   protected readonly reviewError = signal('');
+  protected readonly pendingAction = signal<'borrow' | 'reserve' | null>(null);
 
   protected readonly bookId = computed(() => Number(this.id()));
+
+  protected readonly borrowDuePreview = computed(() => {
+    const due = new Date();
+    due.setDate(due.getDate() + 14);
+    return due.toLocaleDateString('fr-FR');
+  });
 
   protected readonly loginReturnUrl = computed(() => {
     const id = this.bookId();
@@ -112,14 +119,21 @@ export class BookDetailPage {
   }
 
   borrow(): void {
-    const book = this.book();
-    if (!book || this.borrowing()) {
+    this.actionError.set('');
+    this.actionMessage.set('');
+    this.pendingAction.set('borrow');
+  }
+
+  protected cancelPendingAction(): void {
+    if (this.borrowing() || this.reserving()) {
       return;
     }
-    const duePreview = new Date();
-    duePreview.setDate(duePreview.getDate() + 14);
-    const label = duePreview.toLocaleDateString('fr-FR');
-    if (!confirm(`Emprunter « ${book.title} » ?\nDate de retour prévue : ${label}`)) {
+    this.pendingAction.set(null);
+  }
+
+  protected confirmBorrow(): void {
+    const book = this.book();
+    if (!book || this.borrowing()) {
       return;
     }
 
@@ -129,6 +143,7 @@ export class BookDetailPage {
     this.loanApi.borrow(book.id).subscribe({
       next: (loan) => {
         this.borrowing.set(false);
+        this.pendingAction.set(null);
         this.loanDueDate.set(
           new Date(loan.dueDate + 'T12:00:00').toLocaleDateString('fr-FR'),
         );
@@ -138,7 +153,7 @@ export class BookDetailPage {
       error: (error: HttpErrorResponse) => {
         this.borrowing.set(false);
         const detail = (error.error as ProblemDetail | null)?.detail;
-        this.actionError.set(detail ?? 'Impossible d\'emprunter ce livre.');
+        this.actionError.set(detail ?? "Impossible d'emprunter ce livre.");
       },
     });
   }
@@ -170,11 +185,14 @@ export class BookDetailPage {
   }
 
   reserve(): void {
+    this.actionError.set('');
+    this.actionMessage.set('');
+    this.pendingAction.set('reserve');
+  }
+
+  protected confirmReserve(): void {
     const book = this.book();
     if (!book || this.reserving()) {
-      return;
-    }
-    if (!confirm(`Rejoindre la file d'attente pour « ${book.title} » ?`)) {
       return;
     }
     this.reserving.set(true);
@@ -183,6 +201,7 @@ export class BookDetailPage {
     this.reservationApi.reserve(book.id).subscribe({
       next: (reservation) => {
         this.reserving.set(false);
+        this.pendingAction.set(null);
         const position = reservation.queuePosition
           ? ` (position ${reservation.queuePosition})`
           : '';

@@ -39,25 +39,82 @@
 
         <div class="actions">
           @if (actionMessage()) {
-            <div class="alert alert-success">{{ actionMessage() }}</div>
+            <div class="alert alert-success">
+              {{ actionMessage() }}
+              @if (actionMessage().includes('Emprunt')) {
+                <a routerLink="/loans" class="alert-link">Voir mes emprunts</a>
+              }
+              @if (actionMessage().includes('Réservation')) {
+                <a routerLink="/reservations" class="alert-link">Mes réservations</a>
+              }
+            </div>
           }
           @if (actionError()) {
             <div class="alert alert-error">{{ actionError() }}</div>
           }
           @if (session.isLoggedIn()) {
-            @if (book.available) {
-              <button type="button" class="btn btn-primary" [disabled]="borrowing()" (click)="borrow()">
-                {{ borrowing() ? 'Emprunt…' : 'Emprunter' }}
-              </button>
+            @if (pendingAction() === 'borrow') {
+              <div class="confirm-panel card">
+                <h3>Confirmer l'emprunt</h3>
+                <p>
+                  Vous empruntez <strong>« {{ book.title }} »</strong>.
+                </p>
+                <p class="confirm-detail">
+                  À rendre avant le <strong>{{ borrowDuePreview() }}</strong> (14 jours).
+                </p>
+                <p class="muted confirm-rules">Maximum 3 emprunts en cours · pas d'emprunt si vous avez un retard.</p>
+                <div class="confirm-actions">
+                  <button
+                    type="button"
+                    class="btn btn-primary"
+                    [disabled]="borrowing()"
+                    (click)="confirmBorrow()"
+                  >
+                    {{ borrowing() ? 'Emprunt…' : 'Confirmer l\'emprunt' }}
+                  </button>
+                  <button
+                    type="button"
+                    class="btn btn-outline"
+                    [disabled]="borrowing()"
+                    (click)="cancelPendingAction()"
+                  >
+                    Annuler
+                  </button>
+                </div>
+              </div>
+            } @else if (pendingAction() === 'reserve') {
+              <div class="confirm-panel card">
+                <h3>Confirmer la réservation</h3>
+                <p>
+                  Rejoindre la file d'attente pour <strong>« {{ book.title }} »</strong> ?
+                </p>
+                <p class="muted confirm-rules">
+                  Vous serez notifié quand un exemplaire se libère. Délai de retrait : 48 h une fois
+                  l'exemplaire prêt.
+                </p>
+                <div class="confirm-actions">
+                  <button
+                    type="button"
+                    class="btn btn-primary"
+                    [disabled]="reserving()"
+                    (click)="confirmReserve()"
+                  >
+                    {{ reserving() ? 'Réservation…' : 'Confirmer la réservation' }}
+                  </button>
+                  <button
+                    type="button"
+                    class="btn btn-outline"
+                    [disabled]="reserving()"
+                    (click)="cancelPendingAction()"
+                  >
+                    Annuler
+                  </button>
+                </div>
+              </div>
+            } @else if (book.available) {
+              <button type="button" class="btn btn-primary" (click)="borrow()">Emprunter</button>
             } @else {
-              <button
-                type="button"
-                class="btn btn-primary"
-                [disabled]="reserving()"
-                (click)="reserve()"
-              >
-                {{ reserving() ? 'Réservation…' : 'Réserver' }}
-              </button>
+              <button type="button" class="btn btn-primary" (click)="reserve()">Réserver</button>
               <p class="reserve-hint">
                 Vous serez prévenu par la file d'attente (48 h pour retirer l'exemplaire).
               </p>

@@ -19,6 +19,7 @@ export class MyReservations implements OnInit {
   protected readonly errorMessage = signal('');
   protected readonly rowError = signal('');
   protected readonly busyId = signal<number | null>(null);
+  protected readonly cancelConfirmId = signal<number | null>(null);
 
   ngOnInit(): void {
     this.reload();
@@ -44,11 +45,20 @@ export class MyReservations implements OnInit {
     return new Date(iso).toLocaleString('fr-FR');
   }
 
-  protected cancel(item: Reservation): void {
+  protected askCancel(item: Reservation): void {
+    this.rowError.set('');
+    this.cancelConfirmId.set(item.id);
+  }
+
+  protected dismissCancel(): void {
     if (this.busyId() !== null) {
       return;
     }
-    if (!confirm(`Annuler la réservation de « ${item.bookTitle} » ?`)) {
+    this.cancelConfirmId.set(null);
+  }
+
+  protected confirmCancel(item: Reservation): void {
+    if (this.busyId() !== null) {
       return;
     }
     this.busyId.set(item.id);
@@ -56,6 +66,7 @@ export class MyReservations implements OnInit {
     this.api.cancel(item.id).subscribe({
       next: () => {
         this.busyId.set(null);
+        this.cancelConfirmId.set(null);
         this.reload();
       },
       error: (err: HttpErrorResponse) => {

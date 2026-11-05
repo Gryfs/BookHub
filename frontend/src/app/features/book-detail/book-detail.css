@@ -78,6 +78,46 @@
   align-items: flex-start;
   gap: 0.75rem;
   margin-top: 1.25rem;
+  width: 100%;
+  max-width: 32rem;
+}
+
+.confirm-panel {
+  width: 100%;
+  padding: 1.25rem;
+  border: 1px solid var(--color-border);
+  background: var(--color-primary-light);
+}
+
+.confirm-panel h3 {
+  margin: 0 0 0.5rem;
+  font-size: 1.1rem;
+  color: var(--color-primary-dark);
+}
+
+.confirm-detail {
+  margin: 0.35rem 0;
+}
+
+.confirm-rules {
+  margin: 0 0 1rem;
+  font-size: 0.9rem;
+}
+
+.confirm-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.alert-link {
+  display: inline-block;
+  margin-left: 0.5rem;
+  font-weight: 700;
+}
+
+.alert-success .alert-link {
+  color: var(--color-success);
 }
 
 .reserve-hint {

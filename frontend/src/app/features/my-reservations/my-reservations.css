@@ -35,6 +35,23 @@ li.ready {
   margin-top: 0.75rem;
 }
 
+.confirm-panel {
+  margin-top: 0.75rem;
+  padding: 1rem;
+  border-radius: var(--radius);
+  border: 1px solid var(--color-border);
+  background: var(--color-danger-light);
+}
+
+.confirm-panel p {
+  margin: 0 0 0.75rem;
+}
+
+.btn-small {
+  padding: 0.45rem 0.85rem;
+  font-size: 0.9rem;
+}
+
 .empty {
   text-align: center;
 }

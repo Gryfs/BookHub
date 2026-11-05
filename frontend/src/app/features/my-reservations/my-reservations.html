@@ -29,21 +29,47 @@
         @if (item.pickupDeadline) {
           <p class="deadline">À retirer avant le {{ formatDateTime(item.pickupDeadline) }}</p>
         }
-        <div class="actions">
-          @if (item.status === 'AVAILABLE') {
-            <a class="btn btn-primary btn-small" [routerLink]="['/books', item.bookId]"
-              >Emprunter maintenant</a
+        @if (cancelConfirmId() === item.id) {
+          <div class="confirm-panel">
+            <p>
+              Annuler la réservation de <strong>« {{ item.bookTitle }} »</strong> ?
+            </p>
+            <div class="actions">
+              <button
+                type="button"
+                class="btn btn-danger btn-small"
+                [disabled]="busyId() === item.id"
+                (click)="confirmCancel(item)"
+              >
+                {{ busyId() === item.id ? 'Annulation…' : 'Oui, annuler' }}
+              </button>
+              <button
+                type="button"
+                class="btn btn-outline btn-small"
+                [disabled]="busyId() === item.id"
+                (click)="dismissCancel()"
+              >
+                Non, garder
+              </button>
+            </div>
+          </div>
+        } @else {
+          <div class="actions">
+            @if (item.status === 'AVAILABLE') {
+              <a class="btn btn-primary btn-small" [routerLink]="['/books', item.bookId]"
+                >Emprunter maintenant</a
+              >
+            }
+            <button
+              type="button"
+              class="btn btn-outline btn-small"
+              [disabled]="busyId() === item.id"
+              (click)="askCancel(item)"
             >
-          }
-          <button
-            type="button"
-            class="btn btn-outline btn-small"
-            [disabled]="busyId() === item.id"
-            (click)="cancel(item)"
-          >
-            Annuler
-          </button>
-        </div>
+              Annuler
+            </button>
+          </div>
+        }
       </li>
     }
   </ul>

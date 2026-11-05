@@ -47,7 +47,7 @@ public class LoanService {
     return openLoan(user, bookId, true);
   }
 
-  @Transactional(readOnly = true)
+  @Transactional
   public List<LibrarianLoanResponse> listOutstandingLoans() {
     syncLateStatuses();
     return loanRepository.findByStatusInOrderByLoanDateAsc(ONGOING).stream()
@@ -56,7 +56,7 @@ public class LoanService {
         .toList();
   }
 
-  @Transactional(readOnly = true)
+  @Transactional
   public List<LibrarianLoanResponse> listOverdueLoans() {
     syncLateStatuses();
     return loanRepository.findByStatusInOrderByLoanDateAsc(List.of(LoanStatus.LATE)).stream()

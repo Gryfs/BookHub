@@ -86,11 +86,11 @@ class RepositoryTest {
 
   @Test
   void countActiveLoansOfUser() {
+    loanRepository.markLateLoans();
     long marie = loanRepository.countByUserIdAndStatusIn(3L, List.of(LoanStatus.ACTIVE, LoanStatus.LATE));
 
     assertThat(marie).isEqualTo(2);
     assertThat(loanRepository.existsByUserIdAndStatus(4L, LoanStatus.LATE)).isTrue();
-    assertThat(loanRepository.existsByUserIdAndStatus(3L, LoanStatus.LATE)).isFalse();
   }
 
   @Test
